@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://vegavath.com/sitemap.xml
+
+# Security - Block admin panel from search engines
+User-agent: *
+Disallow: /sus
+
+# Allow specific pages
+Allow: /
+Allow: /about
+Allow: /crew
+Allow: /gallery
+Allow: /hackathon
+Allow: /join
+Allow: /guidelines
+
+# Crawl-delay (optional)
+Crawl-delay: 1
