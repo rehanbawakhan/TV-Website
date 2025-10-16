@@ -2,7 +2,7 @@
 
 A modern, interactive website for the Vegavath Technical Club featuring 3D animations, cinematic design, and comprehensive club management features.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 14+ with TypeScript
 - **3D Graphics**: React Three Fiber (R3F) + Drei
@@ -12,7 +12,7 @@ A modern, interactive website for the Vegavath Technical Club featuring 3D anima
 - **Forms**: React Hook Form
 - **Deployment**: Vercel
 
-## 🏗️ Project Structure
+## Project Structure
 
 ```
 vegavath/
@@ -27,7 +27,7 @@ vegavath/
 └── .env.example             # Environment variables template
 ```
 
-## 🛠️ Setup Instructions
+## Setup Instructions
 
 ### 1. Clone and Install Dependencies
 
@@ -59,7 +59,7 @@ npm run dev
 
 Visit `http://localhost:3000` to see the website.
 
-## 🎨 Features
+## Features
 
 ### Current Implementation
 - ✅ Cinematic loading screen with Vegavath logo animation (4s, only on first visit)
@@ -83,17 +83,17 @@ Visit `http://localhost:3000` to see the website.
 - [ ] Admin dashboard for managing applications
 - [ ] Mobile-optimized 3D experiences
 
-## 🎭 Domains
+## Domains
 
 The club operates in 5 key domains:
 
-1. **Automotive** 🏎️ - Vehicle design and engineering
-2. **Robotics** 🤖 - Autonomous systems and AI
-3. **Design** 🎨 - UI/UX and visual design
-4. **Media** 📸 - Content creation and photography
-5. **Marketing** 📈 - Brand strategy and outreach
+1. **Automotive** - Vehicle design and engineering
+2. **Robotics** - Autonomous systems and AI
+3. **Design** - UI/UX and visual design
+4. **Media** - Content creation and photography
+5. **Marketing** - Brand strategy and outreach
 
-## 🚀 Deployment
+## Deployment
 
 ### Deploy to Vercel
 
@@ -122,7 +122,7 @@ The app can also be deployed to:
 - ✅ Racing animations optimized for 60fps performance
 - ✅ Bundle size optimization with tree shaking
 
-## 🧑‍💻 Development Commands
+## Development Commands
 
 ```bash
 npm run dev          # Start development server
@@ -131,27 +131,19 @@ npm run start        # Start production server
 npm run lint         # Run ESLint
 ```
 
-## 📱 Browser Support
+## Browser Support
 
 - Chrome 90+
 - Firefox 88+
 - Safari 14+
 - Edge 90+
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
-
-## 📧 Contact
-
-For questions about the website or club membership:
-- Email: contact@vegavath.club
-- Website: [vegavath.club](https://vegavath.club)
-
----
 
 Built with ❤️ by the Vegavath Team
