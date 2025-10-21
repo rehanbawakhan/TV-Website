@@ -63,7 +63,7 @@ export interface HackathonRegistration {
 export async function getTeamMembers() {
   try {
     // Check if we have valid Supabase configuration
-    if (supabaseUrl === 'https://placeholder.supabase.co') {
+    if (supabaseUrl == 'https://glbgndtmjqoybzidexdn.supabase.co') {
       throw new Error('Supabase not configured')
     }
     
