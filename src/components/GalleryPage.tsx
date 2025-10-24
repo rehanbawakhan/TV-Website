@@ -20,7 +20,7 @@ export default function GalleryPage() {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
   const [filteredItems, setFilteredItems] = useState<GalleryItem[]>([])
   const [activeFilter, setActiveFilter] = useState('all')
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Changed to false so page shows immediately
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
 
   const [headerRef, headerInView] = useInView({

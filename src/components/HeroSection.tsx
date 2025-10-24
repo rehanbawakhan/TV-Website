@@ -2,32 +2,54 @@
 
 import { Suspense } from 'react'
 import { motion } from 'framer-motion'
-import Scene3D from './Scene3D'
+import dynamic from 'next/dynamic'
+import Link from 'next/link'
+
+// Load the heavy 3D scene only on the client to avoid SSR evaluation issues
+const Scene3D = dynamic(() => import('./Scene3D'), {
+  ssr: false,
+  // Provide a lightweight fallback while the client chunk loads
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="text-orange-500">Loading 3D Scene...</div>
+    </div>
+  ),
+})
 
 export default function HeroSection() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-black">
-      {/* 3D Background (with frosted overlay + Coming Soon tag) */}
-      <div className="absolute inset-0 z-0">
-        <Suspense fallback={
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-orange-500">Loading 3D Scene...</div>
-          </div>
-        }>
-          <Scene3D />
-        </Suspense>
+      {/* 3D Background + overlays */}
+      <div className="absolute inset-0">
+        {/* 3D scene in its own low z-index, non-interactive layer */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="text-orange-500">Loading 3D Scene...</div>
+            </div>
+          }>
+            <Scene3D />
+          </Suspense>
+        </div>
 
         {/* Soft dark overlay + subtle blur to make foreground readable */}
-        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+        <div className="absolute inset-0 z-10 bg-black/30 backdrop-blur-sm" />
 
-        {/* Centered frosted glass card for 3D model status */}
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-64 p-3 bg-white/6 backdrop-blur-md border border-white/10 rounded-lg flex flex-col items-center justify-center">
-          <div className="text-sm text-gray-200 mb-1">3D Model</div>
-          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold text-sm shadow-md">
-            Coming Soon
+        {/* Coming Soon Badge - Top Right */}
+        <motion.div 
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="absolute top-24 right-6 z-20 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-md border border-orange-500/30 rounded-full shadow-lg"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🏎️</span>
+            <div className="text-xs text-gray-200">
+              <div className="font-semibold">3D Model</div>
+              <div className="text-gray-400">Coming Soon</div>
+            </div>
           </div>
-          <div className="text-xs text-gray-300 mt-2">Interactive model coming soon — stay tuned</div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Enhanced Content Overlay */}
@@ -146,40 +168,42 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.8 }}
           >
-            <motion.button 
-              className="group relative px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300"
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: '0 20px 40px rgba(249, 115, 22, 0.25)'
-              }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <span className="relative z-10 flex items-center space-x-2">
-                <span>Start Your Engines</span>
-                <motion.span 
-                  className="text-xl"
-                  animate={{ 
-                    rotateY: [0, 360]
-                  }}
-                  transition={{ 
-                    duration: 2, 
-                    repeat: Infinity,
-                    repeatDelay: 3
-                  }}
-                >
-                  🏎️
-                </motion.span>
-              </span>
-              <motion.div 
-                className="absolute inset-0 bg-white/20"
-                initial={{ scale: 0 }}
-                whileHover={{ scale: 1 }}
+            <Link href="/join">
+              <motion.button 
+                className="group relative px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300"
+                whileHover={{ 
+                  scale: 1.05,
+                  boxShadow: '0 20px 40px rgba(249, 115, 22, 0.25)'
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>Start Your Engines</span>
+                  <motion.span 
+                    className="text-xl"
+                    animate={{ 
+                      rotateY: [0, 360]
+                    }}
+                    transition={{ 
+                      duration: 2, 
+                      repeat: Infinity,
+                      repeatDelay: 3
+                    }}
+                  >
+                    🏎️
+                  </motion.span>
+                </span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20"
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 1 }}
                 transition={{ duration: 0.3 }}
               />
               {/* Enhanced racing stripes */}
               <div className="absolute top-0 left-0 w-1 h-full bg-white/30 transform -skew-x-12"></div>
               <div className="absolute top-0 left-2 w-1 h-full bg-white/20 transform -skew-x-12"></div>
             </motion.button>
+            </Link>
           </motion.div>
         </motion.div>
       </div>

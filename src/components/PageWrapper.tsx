@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useAnimation } from 'framer-motion'
+import { useEffect } from 'react'
 
 interface PageWrapperProps {
   children: React.ReactNode
@@ -11,44 +12,39 @@ interface PageWrapperProps {
 const pageVariants = {
   default: {
     initial: { 
-      opacity: 0, 
-      y: 20, 
-      filter: 'blur(4px)' 
+      opacity: 1, 
+      y: 0, 
     },
     animate: { 
       opacity: 1, 
       y: 0, 
-      filter: 'blur(0px)',
       transition: {
-        duration: 0.5,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.3,
+        ease: "easeOut" as any
       }
     },
     exit: { 
       opacity: 0, 
       y: -10, 
-      filter: 'blur(2px)',
       transition: {
-        duration: 0.3,
-        ease: [0.22, 1, 0.36, 1]
+        duration: 0.2,
+        ease: "easeIn" as any
       }
     }
   },
   hero: {
     initial: { 
-      opacity: 0, 
-      scale: 0.9, 
-      y: 50,
-      filter: 'blur(8px)' 
+      opacity: 1, 
+      scale: 1, 
+      y: 0,
     },
     animate: { 
       opacity: 1, 
       scale: 1, 
       y: 0,
-      filter: 'blur(0px)',
       transition: {
-        duration: 0.8,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 0.3,
+        ease: "easeOut" as any,
         staggerChildren: 0.1
       }
     },
@@ -56,10 +52,9 @@ const pageVariants = {
       opacity: 0, 
       scale: 1.1, 
       y: -30,
-      filter: 'blur(4px)',
       transition: {
         duration: 0.4,
-        ease: [0.22, 1, 0.36, 1]
+        ease: "easeIn" as any
       }
     }
   },
@@ -67,24 +62,21 @@ const pageVariants = {
     initial: { 
       opacity: 0, 
       scale: 0.8, 
-      filter: 'blur(10px)' 
     },
     animate: { 
       opacity: 1, 
       scale: 1, 
-      filter: 'blur(0px)',
       transition: {
         duration: 0.4,
-        ease: [0.34, 1.56, 0.64, 1]
+        ease: "easeOut" as any
       }
     },
     exit: { 
       opacity: 0, 
       scale: 0.8, 
-      filter: 'blur(5px)',
       transition: {
         duration: 0.3,
-        ease: [0.22, 1, 0.36, 1]
+        ease: "easeIn" as any
       }
     }
   }
@@ -95,15 +87,10 @@ export default function PageWrapper({
   className = '', 
   variant = 'default' 
 }: PageWrapperProps) {
+  // Simplified - no animations to prevent blank page issues
   return (
-    <motion.div
-      className={`${className}`}
-      variants={pageVariants[variant]}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-    >
+    <div className={`${className}`}>
       {children}
-    </motion.div>
+    </div>
   )
 }

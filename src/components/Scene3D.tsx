@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls, Environment, Html } from '@react-three/drei'
 import * as THREE from 'three'
@@ -44,15 +44,15 @@ function GoKartModel() {
         <meshStandardMaterial color="#1a1a1a" />
       </mesh>
 
-      {/* Interactive Hotspots */}
-      <Html position={[1.5, 0.5, 0]} distanceFactor={10}>
-        <div className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+      {/* Informational Hotspots (non-interactive, low z-index) */}
+      <Html position={[1.5, 0.5, 0]} distanceFactor={10} transform>
+        <div className="bg-orange-500/70 text-white px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-70 select-none pointer-events-none z-0">
           Engine: 750cc
         </div>
       </Html>
       
-      <Html position={[-1.5, 0.5, 0]} distanceFactor={10}>
-        <div className="bg-orange-500 text-white px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-80 hover:opacity-100 transition-opacity cursor-pointer">
+      <Html position={[-1.5, 0.5, 0]} distanceFactor={10} transform>
+        <div className="bg-orange-500/70 text-white px-2 py-1 rounded text-xs font-bold whitespace-nowrap opacity-70 select-none pointer-events-none z-0">
           Max Speed: 120 km/h
         </div>
       </Html>
@@ -64,14 +64,15 @@ function GoKartModel() {
 function ParticleField() {
   const pointsRef = useRef<THREE.Points>(null)
   const particleCount = 100
-  const positions = new Float32Array(particleCount * 3)
-  
-  // Initialize particle positions
-  for (let i = 0; i < particleCount; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 20
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 20
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 20
-  }
+  const positions = useMemo(() => {
+    const arr = new Float32Array(particleCount * 3)
+    for (let i = 0; i < particleCount; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 20
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 20
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 20
+    }
+    return arr
+  }, [particleCount])
 
   useFrame((state) => {
     if (pointsRef.current) {
@@ -83,12 +84,7 @@ function ParticleField() {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={particleCount}
-          array={positions}
-          itemSize={3}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial size={0.02} color="#FF4500" />
     </points>
