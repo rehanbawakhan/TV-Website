@@ -79,31 +79,31 @@ ALTER TABLE IF EXISTS hackathon_registrations ENABLE ROW LEVEL SECURITY;
 
 -- Policies for public read access
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_read_team') THEN
-    EXECUTE 'CREATE POLICY "Allow public read access on team" ON team FOR SELECT USING (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_read_team') THEN
+    EXECUTE 'CREATE POLICY allow_public_read_team ON team FOR SELECT USING (true)';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_read_gallery') THEN
-    EXECUTE 'CREATE POLICY "Allow public read access on gallery" ON gallery FOR SELECT USING (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_read_gallery') THEN
+    EXECUTE 'CREATE POLICY allow_public_read_gallery ON gallery FOR SELECT USING (true)';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_read_interview_slots') THEN
-    EXECUTE 'CREATE POLICY "Allow public read access on interview slots" ON interview_slots FOR SELECT USING (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_read_interview_slots') THEN
+    EXECUTE 'CREATE POLICY allow_public_read_interview_slots ON interview_slots FOR SELECT USING (true)';
   END IF;
 END $$;
 
 -- Policies for public insert access (applications and hackathon registrations)
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_insert_applications') THEN
-    EXECUTE 'CREATE POLICY "Allow public insert on applications" ON applications FOR INSERT WITH CHECK (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_insert_applications') THEN
+    EXECUTE 'CREATE POLICY allow_public_insert_applications ON applications FOR INSERT WITH CHECK (true)';
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_insert_hackathon_registrations') THEN
-    EXECUTE 'CREATE POLICY "Allow public insert on hackathon_registrations" ON hackathon_registrations FOR INSERT WITH CHECK (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_insert_hackathon_registrations') THEN
+    EXECUTE 'CREATE POLICY allow_public_insert_hackathon_registrations ON hackathon_registrations FOR INSERT WITH CHECK (true)';
   END IF;
 END $$;
 
 -- Policy for interview slot updates (booking)
 DO $$ BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_policy WHERE polname = 'allow_public_update_interview_slots') THEN
-    EXECUTE 'CREATE POLICY "Allow public update on interview slots" ON interview_slots FOR UPDATE USING (true)';
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_policy WHERE polname = 'allow_public_update_interview_slots') THEN
+    EXECUTE 'CREATE POLICY allow_public_update_interview_slots ON interview_slots FOR UPDATE USING (true)';
   END IF;
 END $$;
 
