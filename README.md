@@ -1,6 +1,6 @@
-# Vegavath Technical Club Website
+# Team Vegavath Club Website
 
-A modern, interactive website for the Vegavath Technical Club featuring 3D animations, cinematic design, and comprehensive club management features.
+A modern, interactive website for Team Vegavath featuring 3D animations, cinematic design, and comprehensive club management features.
 
 ## Tech Stack
 
@@ -73,7 +73,7 @@ Visit `http://localhost:3000` to see the website.
 - ✅ Form validation and multi-step registration
 - ✅ Admin panel with login and dashboard
 
-### Planned Features
+### Planned Features / MVP
 - [ ] The Crew page with team member profiles
 - [ ] Interactive gallery with 3D lightbox
 - [ ] Join Us page with multi-step application form
@@ -85,13 +85,14 @@ Visit `http://localhost:3000` to see the website.
 
 ## Domains
 
-The club operates in 5 key domains:
+The club operates in 6 key domains:
 
 1. **Automotive** - Vehicle design and engineering
 2. **Robotics** - Autonomous systems and AI
 3. **Design** - UI/UX and visual design
 4. **Media** - Content creation and photography
 5. **Marketing** - Brand strategy and outreach
+6. **Programming** - Building Projects like this and assisting other domainds.
 
 ## Deployment
 
