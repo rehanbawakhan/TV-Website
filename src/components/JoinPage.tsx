@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
@@ -42,11 +42,22 @@ export default function JoinPage() {
   const [selectedSlot, setSelectedSlot] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [applicationSubmitted, setApplicationSubmitted] = useState(false)
+  const [recruitmentOpen, setRecruitmentOpen] = useState(false)
 
   const [headerRef, headerInView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  // Load recruitment status (default: closed)
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('recruitment_open')
+      setRecruitmentOpen(stored === 'true')
+    } catch (e) {
+      setRecruitmentOpen(false)
+    }
+  }, [])
 
   const totalSteps = 4
 
@@ -247,9 +258,28 @@ export default function JoinPage() {
           </motion.div>
         </div>
       </section>
-
-      {/* Application Form */}
-      <section className="pb-20 px-4">
+      {/* Application Form or Closed Message */}
+      {!recruitmentOpen ? (
+        <section className="pb-20 px-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gray-900/60 backdrop-blur-sm border border-gray-700/50 rounded-xl p-8 text-center">
+              <motion.div
+                animate={{ opacity: [1, 0.3, 1], scale: [1, 0.99, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="mb-4"
+              >
+                <div className="text-6xl">🚫</div>
+              </motion.div>
+              <h2 className="text-3xl font-bold text-white mb-2">Recruitment Closed</h2>
+              <p className="text-gray-300 mb-4">We are not accepting applications right now. Please check back later or follow our announcements for updates.</p>
+              <div className="flex justify-center">
+                <a href="/" className="px-6 py-3 bg-gradient-orange text-white rounded-lg">Back to Home</a>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="pb-20 px-4">
         <div className="max-w-2xl mx-auto">
           <div className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-8">
             <AnimatePresence mode="wait">
@@ -515,6 +545,7 @@ export default function JoinPage() {
           </div>
         </div>
       </section>
+      )}
     </div>
   )
 }

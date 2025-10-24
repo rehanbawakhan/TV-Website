@@ -42,6 +42,7 @@ interface Announcement {
 
 export default function AdminPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [recruitmentOpen, setRecruitmentOpen] = useState(false)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
@@ -139,6 +140,26 @@ export default function AdminPage() {
     setUsername('')
     setPassword('')
     setActiveTab('dashboard')
+  }
+
+  // Load recruitment status from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('recruitment_open')
+      setRecruitmentOpen(stored === 'true')
+    } catch (e) {
+      setRecruitmentOpen(false)
+    }
+  }, [])
+
+  const toggleRecruitment = () => {
+    const next = !recruitmentOpen
+    setRecruitmentOpen(next)
+    try {
+      localStorage.setItem('recruitment_open', next ? 'true' : 'false')
+    } catch (e) {
+      // ignore
+    }
   }
 
   const toggleAnnouncement = (id: string) => {
@@ -323,6 +344,19 @@ export default function AdminPage() {
             >
               Logout
             </motion.button>
+            
+            {/* Recruitment toggle */}
+            <div className="ml-4 flex items-center space-x-3">
+              <div className={`px-3 py-1 rounded-full text-sm font-semibold ${recruitmentOpen ? 'bg-green-600 text-white' : 'bg-red-600 text-white'}`}>
+                {recruitmentOpen ? 'Recruitment Open' : 'Recruitment Closed'}
+              </div>
+              <button
+                onClick={toggleRecruitment}
+                className="px-3 py-1 bg-gray-800/40 text-sm rounded-lg hover:bg-gray-800/60 transition-colors"
+              >
+                Toggle
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -333,7 +367,7 @@ export default function AdminPage() {
           <div className="flex space-x-1 bg-gray-800/50 rounded-lg p-1">
             {[
               { id: 'dashboard', name: 'Dashboard', icon: '📊' },
-              { id: 'hackathon', name: 'Hackathon', icon: '🏁' },
+              { id: 'hackathon', name: 'Ignition 1.0', icon: '🏁' },
               { id: 'join-requests', name: 'Join Requests', icon: '👥' },
               { id: 'announcements', name: 'Announcements', icon: '📢' },
               { id: 'content', name: 'Content', icon: '📝' }
@@ -370,7 +404,7 @@ export default function AdminPage() {
                 className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
               >
                 {[
-                  { title: 'Hackathon Registrations', value: hackathonSubmissions.length, icon: '🏁', color: 'orange' },
+                  { title: 'Ignition 1.0 Registrations', value: hackathonSubmissions.length, icon: '🏁', color: 'orange' },
                   { title: 'Join Requests', value: joinRequests.length, icon: '👥', color: 'blue' },
                   { title: 'Active Announcements', value: announcements.filter(a => a.active).length, icon: '📢', color: 'green' },
                   { title: 'Total Members', value: '87', icon: '🏆', color: 'purple' }
@@ -403,7 +437,7 @@ export default function AdminPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-white">Hackathon Registrations</h2>
+                <h2 className="text-2xl font-bold text-white">Ignition 1.0 Registrations</h2>
                 
                 <div className="space-y-4">
                   {hackathonSubmissions.map((submission) => (

@@ -1,0 +1,2 @@
+-- This file has been merged into supabase_schema.sql. Please run that file instead:
+-- supabase_schema.sql

@@ -223,7 +223,7 @@ export default function ScrollingSection() {
           >
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">
               <span className="text-transparent bg-clip-text bg-gradient-orange">
-                VegaHack
+                Ignition 1.0
               </span>{' '}
               2025
             </h2>
@@ -252,21 +252,32 @@ export default function ScrollingSection() {
               </div>
             </div>
 
-            <motion.a
-              href="/hackathon"
-              className="group relative inline-block px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span className="relative z-10 flex items-center space-x-2">
-                <span>Register Now</span>
-                <span className="text-xl">🚀</span>
-              </span>
-              <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-              {/* Racing stripes */}
-              <div className="absolute top-0 left-0 w-1 h-full bg-white/30 transform -skew-x-12"></div>
-              <div className="absolute top-0 left-2 w-1 h-full bg-white/20 transform -skew-x-12"></div>
-            </motion.a>
+            <div className="flex items-center justify-center gap-4">
+              <motion.a
+                href="/hackathon"
+                className="group relative inline-block px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>Register Now</span>
+                  <span className="text-xl">🚀</span>
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                {/* Racing stripes */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-white/30 transform -skew-x-12"></div>
+                <div className="absolute top-0 left-2 w-1 h-full bg-white/20 transform -skew-x-12"></div>
+              </motion.a>
+
+              {/* Guidelines button moved to home next to Register Now (blue gradient) */}
+              <button
+                onClick={() => window.open('/guidelines', '_blank')}
+                className="group relative inline-block px-6 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105"
+              >
+                <span className="relative z-10">Guidelines</span>
+                <div className="absolute inset-0 bg-white/10 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+              </button>
+            </div>
           </motion.div>
 
           {/* Interactive 3D Section */}

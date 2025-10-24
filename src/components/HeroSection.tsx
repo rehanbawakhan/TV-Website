@@ -7,15 +7,27 @@ import Scene3D from './Scene3D'
 export default function HeroSection() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-black">
-      {/* 3D Background */}
-      <div className="absolute inset-0 z-10">
+      {/* 3D Background (with frosted overlay + Coming Soon tag) */}
+      <div className="absolute inset-0 z-0">
         <Suspense fallback={
           <div className="w-full h-full flex items-center justify-center">
             <div className="text-orange-500">Loading 3D Scene...</div>
           </div>
         }>
-          <div className="w-full h-full bg-gradient-radial from-orange-500/20 via-transparent to-transparent" />
+          <Scene3D />
         </Suspense>
+
+        {/* Soft dark overlay + subtle blur to make foreground readable */}
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" />
+
+        {/* Centered frosted glass card for 3D model status */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-64 p-3 bg-white/6 backdrop-blur-md border border-white/10 rounded-lg flex flex-col items-center justify-center">
+          <div className="text-sm text-gray-200 mb-1">3D Model</div>
+          <div className="px-3 py-1 rounded-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold text-sm shadow-md">
+            Coming Soon
+          </div>
+          <div className="text-xs text-gray-300 mt-2">Interactive model coming soon — stay tuned</div>
+        </div>
       </div>
 
       {/* Enhanced Content Overlay */}

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '../../components/Navigation'
+import toast from 'react-hot-toast'
 
 interface Member {
   name: string
@@ -11,6 +12,8 @@ interface Member {
   phone: string
   semester: string
   section: string
+  department?: string
+  hostel?: string
 }
 
 interface FormData {
@@ -21,6 +24,9 @@ interface FormData {
   members: Member[]
   experience: string
   idea: string
+  campus?: string
+  proposalPdf?: File | null
+  paymentScreenshot?: File | null
 }
 
 export default function HackathonRegister() {
@@ -38,6 +44,10 @@ export default function HackathonRegister() {
     ],
     experience: '',
     idea: ''
+    ,
+    campus: '',
+    proposalPdf: null,
+    paymentScreenshot: null
   })
 
   const handleNext = () => {
@@ -51,10 +61,11 @@ export default function HackathonRegister() {
       case 1:
         return formData.teamName.trim() && formData.teamLeader.trim() && formData.email.trim() && formData.phone.trim()
       case 2:
-        return formData.members.every(member => 
-          member.name.trim() && member.srn.trim() && member.email.trim() && 
-          member.phone.trim() && member.semester.trim() && member.section.trim()
-        )
+        // Require at least 2 members with complete details (name, srn, email, phone, semester, section)
+        const validCount = formData.members.filter(member => (
+          member.name.trim() && member.srn.trim() && member.email.trim() && member.phone.trim() && member.semester.trim() && member.section.trim()
+        )).length
+        return validCount >= 2
       case 3:
         return formData.experience.trim() && formData.idea.trim()
       default:
@@ -66,10 +77,51 @@ export default function HackathonRegister() {
     if (step > 1) setStep(step - 1)
   }
 
-  const handleSubmit = () => {
-    // Handle form submission
-    console.log('Form submitted:', formData)
-    setStep(4) // Payment step
+  const handleSubmit = async () => {
+    // Handle form submission: upload files and save registration server-side via Supabase
+    try {
+      const filteredMembers = formData.members.filter((m) => m.name && m.name.trim())
+
+      // Helper: convert file to data URL
+      const fileToDataUrl = (file: File | null | undefined) => new Promise<string | null>((resolve) => {
+        if (!file) return resolve(null)
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = () => resolve(null)
+        reader.readAsDataURL(file)
+      })
+
+      const proposalData = await fileToDataUrl((formData as any).proposalPdf)
+      const paymentData = await fileToDataUrl((formData as any).paymentScreenshot)
+
+      const payload = {
+        teamName: formData.teamName,
+        teamLeader: formData.teamLeader,
+        email: formData.email,
+        phone: formData.phone,
+        campus: formData.campus,
+        members: filteredMembers,
+        experience: formData.experience,
+        idea: formData.idea,
+        proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
+        paymentScreenshot: paymentData ? { name: (formData as any).paymentScreenshot.name, data: paymentData } : null,
+      }
+
+      const res = await fetch('/api/hackathon/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+
+      const result = await res.json()
+      if (!res.ok) throw result
+
+      toast.success('Registration submitted successfully!')
+      setStep(4)
+    } catch (error) {
+      console.error('Error submitting registration:', error)
+      toast.error('Failed to submit registration. Please try again.')
+    }
   }
 
   return (
@@ -87,12 +139,12 @@ export default function HackathonRegister() {
           >
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-4 modern-title">
               <span className="text-transparent bg-clip-text bg-gradient-orange">
-                VegaHack
+                Ignition 1.0
               </span>{' '}
               Registration
             </h1>
             <p className="text-gray-400 text-lg modern-body">
-              Rev up your engines for the ultimate coding marathon!
+              Register your team for Ignition 1.0 — bring your proposed solutions and race to build the best project.
             </p>
           </motion.div>
 
@@ -128,7 +180,7 @@ export default function HackathonRegister() {
           >
             {step === 1 && (
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Team Information</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Hackathon Registration Details</h2>
                 <div className="space-y-4">
                   <input
                     type="text"
@@ -137,13 +189,24 @@ export default function HackathonRegister() {
                     onChange={(e) => setFormData({...formData, teamName: e.target.value})}
                     className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
                   />
-                  <input
-                    type="text"
-                    placeholder="Team Leader Name"
-                    value={formData.teamLeader}
-                    onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
-                    className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Team Leader Name"
+                      value={formData.teamLeader}
+                      onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
+                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                    />
+                    <select
+                      value={formData['campus'] || ''}
+                      onChange={(e) => setFormData({...formData, campus: e.target.value})}
+                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                    >
+                      <option value="">Select Campus (EC / RR)</option>
+                      <option value="EC">EC</option>
+                      <option value="RR">RR</option>
+                    </select>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
                       type="email"
@@ -166,15 +229,15 @@ export default function HackathonRegister() {
 
             {step === 2 && (
               <div>
-                <h2 className="text-2xl font-bold text-white mb-6">Member Details</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Member Details (Min 2 — Max 4)</h2>
                 <p className="text-gray-400 text-sm mb-6">
-                  🏁 Add details for up to 4 team members (including team leader)
+                  🏁 Provide details for each team member. Minimum 2 members required (including team leader). Up to 4 members allowed.
                 </p>
                 <div className="space-y-6">
                   {formData.members.map((member, index) => (
                     <div key={index} className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
                       <h3 className="text-white font-semibold mb-4">
-                        Member {index + 1} {index === 0 ? '(Team Leader)' : '(Optional)'}
+                        Member {index + 1} {index === 0 ? '(Team Leader)' : (index < 2 ? '(Required)' : '(Optional)')}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
@@ -199,7 +262,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 2}
                         />
                         <input
                           type="email"
@@ -223,7 +286,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 2}
                         />
                         <input
                           type="text"
@@ -235,7 +298,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 2}
                         />
                         <input
                           type="text"
@@ -247,8 +310,38 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 2}
                         />
+                        {/* Additional fields: Department & Hostelite/Day Scholar */}
+                        <select
+                          value={(member as any).department || ''}
+                          onChange={(e) => {
+                            const newMembers = [...formData.members]
+                            newMembers[index] = { ...(member as any), department: e.target.value }
+                            setFormData({...formData, members: newMembers})
+                          }}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                        >
+                          <option value="">Department (CSE/AIML/ECE/Mech)</option>
+                          <option value="CSE">CSE</option>
+                          <option value="AIML">AIML</option>
+                          <option value="ECE">ECE</option>
+                          <option value="Mech">Mech</option>
+                        </select>
+
+                        <select
+                          value={(member as any).hostel || ''}
+                          onChange={(e) => {
+                            const newMembers = [...formData.members]
+                            newMembers[index] = { ...(member as any), hostel: e.target.value }
+                            setFormData({...formData, members: newMembers})
+                          }}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                        >
+                          <option value="">Hostelite / Day Scholar</option>
+                          <option value="Hostelite">Hostelite</option>
+                          <option value="Day Scholar">Day Scholar</option>
+                        </select>
                       </div>
                     </div>
                   ))}
@@ -280,6 +373,52 @@ export default function HackathonRegister() {
                   <div className="text-center pt-4">
                     <p className="text-2xl font-bold text-orange-500">Registration Fee: ₹500</p>
                     <p className="text-gray-400 text-sm">per team</p>
+                  </div>
+
+                  {/* File uploads: Proposed Solution PDF and Payment Screenshot */}
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
+                      <label className="block text-sm text-gray-300 mb-2">Proposed Solution (PDF)</label>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null
+                          setFormData({...formData, proposalPdf: file})
+                        }}
+                        className="w-full text-sm text-gray-300"
+                      />
+                      <div className="mt-2 text-xs text-gray-400">Upload a single PDF containing your proposed solution.</div>
+                    </div>
+
+                    <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
+                      <label className="block text-sm text-gray-300 mb-2">Payment Screenshot (Image)</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null
+                          setFormData({...formData, paymentScreenshot: file})
+                        }}
+                        className="w-full text-sm text-gray-300"
+                      />
+                      <div className="mt-2 text-xs text-gray-400">Upload a screenshot of your payment confirmation.</div>
+                    </div>
+                  </div>
+
+                  {/* Simple diff panel showing uploaded file info */}
+                  <div className="mt-4 p-4 border border-gray-700 rounded-lg bg-gray-900/30">
+                    <h4 className="text-white font-semibold mb-2">Uploaded Files (Diff Panel)</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="text-sm text-gray-300">
+                        <div className="font-medium">Proposal PDF</div>
+                        <div className="text-xs text-gray-400">{(formData as any).proposalPdf ? (formData as any).proposalPdf.name : 'No file uploaded'}</div>
+                      </div>
+                      <div className="text-sm text-gray-300">
+                        <div className="font-medium">Payment Screenshot</div>
+                        <div className="text-xs text-gray-400">{(formData as any).paymentScreenshot ? (formData as any).paymentScreenshot.name : 'No file uploaded'}</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -321,13 +460,7 @@ export default function HackathonRegister() {
                 </button>
                 
                 <div className="flex gap-4">
-                  {/* Guidelines Button */}
-                  <button
-                    onClick={() => window.open('/guidelines', '_blank')}
-                    className="px-6 py-3 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all"
-                  >
-                    📋 Guidelines
-                  </button>
+                  {/* Guidelines Button removed from registration page per request */}
                   
                   <button
                     onClick={step === 3 ? handleSubmit : handleNext}

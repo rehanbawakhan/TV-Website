@@ -75,53 +75,158 @@ export async function getTeamMembers() {
     if (error) throw error
     return data as TeamMember[]
   } catch (error) {
-    // Return placeholder data if Supabase is not configured
+    // Return real crew data, segregated
     return [
+      // Core
       {
-        id: '1',
-        name: 'Alex Thompson',
-        role: 'Club President',
-        domain: 'Automotive' as const,
-        bio: 'Leading the charge in automotive innovation and racing technology development.',
+        id: 'core-1',
+        name: 'Naveen S',
+        role: 'Club Head',
+        domain: 'Automotive',
+        bio: 'When life gives you lemonade, make lemons. Life will be all like, "Whaaaat?"',
+        photo_url: '',
+        created_at: new Date().toISOString(),
+      },
+      // Crew
+      {
+        id: 'crew-1',
+        name: 'Karan Maheshwari',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: '',
+        photo_url: getCrewImagePath('Karan Maheshwari.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-2',
+        name: 'Bhuvi Bagga',
+        role: 'Member',
+        domain: 'Design',
+        bio: 'Powered by caffeine, creativity, and convincing emails. As a part of the sponsorship team, I make sure our passion gets the backing it deserves',
+        photo_url: getCrewImagePath('Bhuvi Bagga.jpeg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-3',
+        name: 'Velkur Tanisha Reddy',
+        role: 'Member',
+        domain: 'Design',
+        bio: 'Adventure awaits, fueled by adrenaline',
+        photo_url: getCrewImagePath('Tanisha Reddy.jpeg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-4',
+        name: 'Dhruv Maheshwari',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: 'design bro.',
+        photo_url: getCrewImagePath('Dhruv Maheshwari.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-5',
+        name: 'Siddharth Shilin',
+        role: 'Member',
+        domain: 'Robotics',
+        bio: 'Came for the cars, stayed for the chaos.',
         photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
       {
-        id: '2',
-        name: 'Sarah Chen',
-        role: 'Technical Lead',
-        domain: 'Robotics' as const,
-        bio: 'Specializes in autonomous systems and robotics development for racing applications.',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        id: 'crew-6',
+        name: 'Abhigyan',
+        role: 'Member',
+        domain: 'Robotics',
+        bio: 'He who wasn\'t.',
+        photo_url: getCrewImagePath('Abhigyan.jpg'),
         created_at: new Date().toISOString(),
       },
       {
-        id: '3',
-        name: 'Marcus Rodriguez',
-        role: 'Design Director',
-        domain: 'Design' as const,
-        bio: 'Crafting sleek aerodynamic designs and user experiences for high-performance vehicles.',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        id: 'crew-7',
+        name: 'Aarush Khullar',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: 'Just a chill guy with a caffeine addiction',
+        photo_url: getCrewImagePath('Aarush khullar.jpg'),
         created_at: new Date().toISOString(),
       },
       {
-        id: '4',
-        name: 'Emma Wilson',
-        role: 'Media Chief',
-        domain: 'Media' as const,
-        bio: 'Capturing the thrill of racing and creating compelling visual content.',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        id: 'crew-8',
+        name: 'Yadunandana Reddy M',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: 'I touch photoshop',
+        photo_url: getCrewImagePath('Yadunandan Reddy.JPG'),
         created_at: new Date().toISOString(),
       },
       {
-        id: '5',
-        name: 'Ryan Park',
-        role: 'Marketing Lead',
-        domain: 'Marketing' as const,
-        bio: 'Accelerating brand growth and building strategic partnerships in motorsports.',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        id: 'crew-9',
+        name: 'Bhuvigna Reddy A T',
+        role: 'Member',
+        domain: 'Design',
+        bio: 'YOLOing at full throttle - No pit stops !!',
+        photo_url: getCrewImagePath('Bhuvigna Reddy.jpg'),
         created_at: new Date().toISOString(),
       },
+      {
+        id: 'crew-10',
+        name: 'Miruthulaa E M',
+        role: 'Member',
+        domain: 'Design',
+        bio: "If you're going hard enough left, you'll find yourself turning right.",
+        photo_url: getCrewImagePath('Miruthulaa.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-11',
+        name: 'Hitha Shree Suresh',
+        role: 'Member',
+        domain: 'Design',
+        bio: 'All eyes on KALESH',
+        photo_url: getCrewImagePath('Hita Shree.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-12',
+        name: 'Architha',
+        role: 'Member',
+        domain: 'Design',
+        bio: 'I am Kalesh',
+        photo_url: getCrewImagePath('Architha SP.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-13',
+        name: 'Nitya Kushwaha',
+        role: 'Member',
+        domain: 'Media',
+        bio: "At the end of the day, it's night.",
+        photo_url: getCrewImagePath('Nitya Kushwaha.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-14',
+        name: 'Shibu Rangarajan',
+        role: 'Member',
+        domain: 'Media',
+        bio: 'Idk man put off smn',
+        photo_url: getCrewImagePath('Shibu.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-15',
+        name: 'Moorty Perepa',
+        role: 'Member',
+        domain: 'Media',
+        bio: "We're going on a trip, on our favourite rocket ship :3",
+        photo_url: getCrewImagePath('Moorty.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      // New Recruits
+      // Add new recruits here
+      // Old Crew
+      // Add old crew here
     ] as TeamMember[]
   }
 }
@@ -171,6 +276,91 @@ export async function submitApplication(application: Omit<Application, 'id' | 'c
   return data[0] as Application
 }
 
+// Upload a file to Supabase storage and return its public URL
+export async function uploadFileToStorage(bucket: string, path: string, file: File) {
+  // Upload
+  const { data, error: uploadError } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, { upsert: true })
+
+  if (uploadError) throw uploadError
+
+  // Make public URL
+  const publicResult = supabase.storage
+    .from(bucket)
+    .getPublicUrl(path)
+
+  // getPublicUrl returns { data: { publicUrl } }
+  // TS: access nested data
+  const publicUrl = (publicResult as any)?.data?.publicUrl || null
+  if (!publicUrl) throw new Error('Failed to create public URL')
+  return publicUrl
+}
+
+interface HackathonMember {
+  name: string
+  srn: string
+  email: string
+  phone: string
+  semester: string
+  section: string
+  department?: string
+  hostel?: string
+}
+
+export async function submitHackathonRegistration(registration: {
+  teamName: string
+  teamLeader: string
+  email: string
+  phone: string
+  campus?: string
+  members: HackathonMember[]
+  experience: string
+  idea: string
+  proposalPdf?: File | null
+  paymentScreenshot?: File | null
+}) {
+  try {
+    let proposalUrl: string | null = null
+    let paymentUrl: string | null = null
+
+    // If files provided, upload them to 'hackathon' bucket. Ensure the bucket exists in Supabase storage.
+    if (registration.proposalPdf) {
+      const safeName = `${Date.now()}_${registration.teamName.replace(/\s+/g, '_')}_proposal.pdf`
+      proposalUrl = await uploadFileToStorage('hackathon', safeName, registration.proposalPdf)
+    }
+
+    if (registration.paymentScreenshot) {
+      const ext = registration.paymentScreenshot.name.split('.').pop() || 'png'
+      const safeName = `${Date.now()}_${registration.teamName.replace(/\s+/g, '_')}_payment.${ext}`
+      paymentUrl = await uploadFileToStorage('hackathon', safeName, registration.paymentScreenshot)
+    }
+
+    const payload = {
+      team_name: registration.teamName,
+      leader_name: registration.teamLeader,
+      leader_email: registration.email,
+      leader_phone: registration.phone,
+      campus: registration.campus || null,
+      members: registration.members,
+      experience: registration.experience,
+      idea: registration.idea,
+      proposal_pdf_url: proposalUrl,
+      payment_screenshot_url: paymentUrl,
+    }
+
+    const { data, error } = await supabase
+      .from('hackathon_registrations')
+      .insert([payload])
+      .select()
+
+    if (error) throw error
+    return data[0]
+  } catch (error) {
+    throw error
+  }
+}
+
 export async function getAvailableInterviewSlots() {
   const { data, error } = await supabase
     .from('interview_slots')
@@ -194,4 +384,15 @@ export async function bookInterviewSlot(slotId: string, applicantEmail: string) 
   
   if (error) throw error
   return data[0] as InterviewSlot
+}
+
+// Fix crew image paths to use /src/lib/crewimg/ for local dev and /crewimg/ for production
+function getCrewImagePath(filename: string) {
+  // If running in production, use /crewimg/ (public folder)
+  // If running locally, use /src/lib/crewimg/
+  if (typeof window !== 'undefined') {
+    // Next.js serves public assets from /public, so use /crewimg/ for both
+    return `/crewimg/${filename}`;
+  }
+  return `/crewimg/${filename}`;
 }
