@@ -1,9 +1,8 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import { Providers } from '@/components/Providers'
-import Footer from '@/components/Footer'
-import HolographicBackground from '../components/HolographicBackground'
-import PageTransition from '@/components/PageTransition'
+import ClientRoot from '@/components/ClientRoot'
+
+export const dynamic = 'force-dynamic'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -81,18 +80,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Providers>
-          <HolographicBackground />
-          <PageTransition>
-            <div className="min-h-screen flex flex-col">
-              <div className="flex-grow">
-                {children}
-              </div>
-              <Footer />
-            </div>
-          </PageTransition>
-        </Providers>
+      {/* suppressHydrationWarning prevents React from logging mismatches caused by browser extensions or client-only injected attributes (e.g. Grammarly) */}
+      <body suppressHydrationWarning className={inter.className}>
+        <ClientRoot>
+          {children}
+        </ClientRoot>
       </body>
     </html>
   )
