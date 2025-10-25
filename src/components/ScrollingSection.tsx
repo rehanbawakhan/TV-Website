@@ -4,6 +4,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 
 // Dynamic import to avoid SSR issues with React Three Fiber
 const Interactive3DScene = dynamic(() => import('./Interactive3DScene'), {
@@ -229,16 +230,16 @@ export default function ScrollingSection() {
             </h2>
 
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Join us for the ultimate 48-hour coding marathon! Experience the thrill of 
+              Join us for the ultimate 24-hour coding and hardware marathon! Experience the thrill of 
               innovation, where the fastest minds race against time to build 
-              groundbreaking solutions. Rev up your engines for VegaHack 2025!
+              groundbreaking solutions. Rev up your engines for Ignition 1.0, on 7th and 8th November, 2025!
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🏁</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">48 Hours</h3>
-                <p className="text-gray-400 text-sm">Non-stop coding sprint</p>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">24 Hours</h3>
+                <p className="text-gray-400 text-sm">A Fun coding sprint</p>
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🏆</div>
@@ -247,7 +248,7 @@ export default function ScrollingSection() {
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🎯</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">5 Domains</h3>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">3 Tracks</h3>
                 <p className="text-gray-400 text-sm">Multiple tracks</p>
               </div>
             </div>
@@ -421,24 +422,28 @@ export default function ScrollingSection() {
             viewport={{ once: true }}
             className="flex flex-col sm:flex-row gap-4 justify-center"
           >
-            <button className="group relative px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25">
-              <span className="relative z-10 flex items-center space-x-2">
-                <span>Join Our Racing Team</span>
-                <span className="text-xl">🏁</span>
-              </span>
-              <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-              {/* Racing stripes */}
-              <div className="absolute top-0 left-0 w-1 h-full bg-white/30 transform -skew-x-12"></div>
-              <div className="absolute top-0 left-2 w-1 h-full bg-white/20 transform -skew-x-12"></div>
-            </button>
+            <Link href="/join">
+              <button className="group relative px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25">
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>Join Our Racing Team</span>
+                  <span className="text-xl">🏁</span>
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                {/* Racing stripes */}
+                <div className="absolute top-0 left-0 w-1 h-full bg-white/30 transform -skew-x-12"></div>
+                <div className="absolute top-0 left-2 w-1 h-full bg-white/20 transform -skew-x-12"></div>
+              </button>
+            </Link>
             
-            <button className="group relative px-8 py-4 border-2 border-orange-500 text-orange-500 font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:text-white">
-              <span className="relative z-10 flex items-center space-x-2">
-                <span>View Racing Gallery</span>
-                <span className="text-xl">📸</span>
-              </span>
-              <div className="absolute inset-0 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
-            </button>
+            <Link href="/gallery">
+              <button className="group relative px-8 py-4 border-2 border-orange-500 text-orange-500 font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:text-white">
+                <span className="relative z-10 flex items-center space-x-2">
+                  <span>View Racing Gallery</span>
+                  <span className="text-xl">📸</span>
+                </span>
+                <div className="absolute inset-0 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+              </button>
+            </Link>
           </motion.div>
         </div>
       </section>

@@ -4,10 +4,9 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 
 const socialLinks = [
-  { name: 'LinkedIn', icon: '💼', href: '#', color: 'hover:text-primary-orange' },
-  { name: 'Instagram', icon: '📷', href: '#', color: 'hover:text-primary-orange' },
-  { name: 'Twitter', icon: '🐦', href: '#', color: 'hover:text-primary-orange' },
-  { name: 'GitHub', icon: '💻', href: '#', color: 'hover:text-gray-300' },
+  { name: 'LinkedIn', icon: '💼', href: 'https://www.linkedin.com/company/team-vegavath-racing/', color: 'hover:text-primary-orange' },
+  { name: 'Instagram', icon: '📷', href: 'https://www.instagram.com/teamvegavath_pesu/', color: 'hover:text-primary-orange' },
+  { name: 'GitHub', icon: '💻', href: 'https://github.com/Team-Vegavath', color: 'hover:text-gray-300' },
   { name: 'YouTube', icon: '📺', href: '#', color: 'hover:text-primary-orangeDark' },
 ]
 
@@ -117,6 +116,8 @@ export default function Footer() {
                   <a
                     key={social.name}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={`w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 ${social.color} transition-all duration-300 hover:scale-110 hover:bg-gray-700`}
                     title={social.name}
                   >
@@ -153,12 +154,11 @@ export default function Footer() {
         >
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-gray-400 text-sm">
-              © 2024 Vegavath Technical Club. All rights reserved.
+              © 2025 Team Vegavath. All rights reserved.
             </div>
             
             <div className="flex items-center space-x-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-orange-500 transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-orange-500 transition-colors">Terms of Service</a>
+              <Link href="/legal" className="hover:text-orange-500 transition-colors">Legal</Link>
               <div className="flex items-center space-x-2">
                 <span>Made with</span>
                 <motion.span

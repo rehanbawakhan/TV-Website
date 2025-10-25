@@ -87,6 +87,24 @@ export async function getTeamMembers() {
         photo_url: '',
         created_at: new Date().toISOString(),
       },
+      {
+        id: 'core-2',
+        name: 'Dhruv Maheshwari',
+        role: 'Design Head',
+        domain: 'Automotive',
+        bio: 'design bro.',
+        photo_url: getCrewImagePath('Dhruv Maheshwari.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'core-3',
+        name: 'Shibu Rangarajan',
+        role: 'Legacy Core',
+        domain: 'Media',
+        bio: 'Idk man put off smn',
+        photo_url: getCrewImagePath('Shibu.jpg'),
+        created_at: new Date().toISOString(),
+      },
       // Crew
       {
         id: 'crew-1',
@@ -113,15 +131,6 @@ export async function getTeamMembers() {
         domain: 'Design',
         bio: 'Adventure awaits, fueled by adrenaline',
         photo_url: getCrewImagePath('Tanisha Reddy.jpeg'),
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 'crew-4',
-        name: 'Dhruv Maheshwari',
-        role: 'Member',
-        domain: 'Automotive',
-        bio: 'design bro.',
-        photo_url: getCrewImagePath('Dhruv Maheshwari.jpg'),
         created_at: new Date().toISOString(),
       },
       {
@@ -203,15 +212,6 @@ export async function getTeamMembers() {
         domain: 'Media',
         bio: "At the end of the day, it's night.",
         photo_url: getCrewImagePath('Nitya Kushwaha.jpg'),
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 'crew-14',
-        name: 'Shibu Rangarajan',
-        role: 'Member',
-        domain: 'Media',
-        bio: 'Idk man put off smn',
-        photo_url: getCrewImagePath('Shibu.jpg'),
         created_at: new Date().toISOString(),
       },
       {

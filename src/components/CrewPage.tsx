@@ -2,9 +2,25 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Image, { type StaticImageData } from 'next/image'
 import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
 import { getTeamMembers, TeamMember } from '@/lib/supabase'
+// Import crew images so the bundler serves them (files live in src/lib/crewimg)
+import IMG_Bhuvi from '@/lib/crewimg/Bhuvi Bagga.jpeg'
+import IMG_Tanisha from '@/lib/crewimg/Tanisha Reddy.jpeg'
+import IMG_Naveen from '@/lib/crewimg/Naveen Selvaraj.jpg'
+import IMG_Dhruv from '@/lib/crewimg/Dhruv Maheshwari.jpg'
+import IMG_Abhigyan from '@/lib/crewimg/Abhigyan.jpg'
+import IMG_Aarush from '@/lib/crewimg/Aarush khullar.jpg'
+import IMG_Yadunandan from '@/lib/crewimg/Yadunandan Reddy.jpg'
+import IMG_Bhuvigna from '@/lib/crewimg/Bhuvigna Reddy.jpg'
+import IMG_Miruthulaa from '@/lib/crewimg/Miruthulaa.jpg'
+import IMG_Hita from '@/lib/crewimg/Hita Shree.jpg'
+import IMG_Architha from '@/lib/crewimg/Architha SP.jpg'
+import IMG_Nitya from '@/lib/crewimg/Nitya Kushwaha.jpg'
+import IMG_Shibu from '@/lib/crewimg/Shibu.jpg'
+import IMG_Moorty from '@/lib/crewimg/Moorty.jpg'
 
 const domainColors = {
   Automotive: 'from-orange-500 to-red-600',
@@ -22,28 +38,59 @@ const domainIcons = {
   Marketing: '📈',
 }
 
-const crewImages = {
-  'Karan Maheshwari': '/crewimg/Karan Maheshwari.jpg',
-  'Bhuvi Bagga': '/crewimg/Bhuvi Bagga.jpeg',
-  'Velkur Tanisha Reddy': '/crewimg/Tanisha Reddy.jpeg',
-  'Naveen S': '/crewimg/Naveen Selvaraj.jpg',
-  'Dhruv Maheshwari': '/crewimg/Dhruv Maheshwari.jpg',
-  'Siddharth Shilin': '/assets/team/placeholder-avatar.jpg',
-  'Abhigyan': '/crewimg/Abhigyan.jpg',
-  'Aarush Khullar': '/crewimg/Aarush khullar.jpg',
-  'Yadunandana Reddy M': '/crewimg/Yadunandan Reddy.JPG',
-  'Bhuvigna Reddy A T': '/crewimg/Bhuvigna Reddy.jpg',
-  'Miruthulaa E M': '/crewimg/Miruthulaa.jpg',
-  'Hitha Shree Suresh': '/crewimg/Hita Shree.jpg',
-  'Architha': '/crewimg/Architha SP.jpg',
-  'Nitya Kushwaha': '/crewimg/Nitya Kushwaha.jpg',
-  'Shibu Rangarajan': '/crewimg/Shibu.jpg',
-  'Moorty Perepa': '/crewimg/Moorty.jpg',
-};
+const crewImages: Record<string, StaticImageData | string> = {
+  'Karan Maheshwari': '/images/Logo.png',
+  'Bhuvi Bagga': IMG_Bhuvi,
+  'Velkur Tanisha Reddy': IMG_Tanisha,
+  'Naveen S': IMG_Naveen,
+  'Dhruv Maheshwari': IMG_Dhruv,
+  'Siddharth Shilin': '/images/Logo.png',
+  'Abhigyan': IMG_Abhigyan,
+  'Aarush Khullar': IMG_Aarush,
+  'Yadunandana Reddy M': '/images/Logo.png',
+  'Bhuvigna Reddy A T': IMG_Bhuvigna,
+  'Miruthulaa E M': IMG_Miruthulaa,
+  'Hitha Shree Suresh': IMG_Hita,
+  'Architha': IMG_Architha,
+  'Nitya Kushwaha': IMG_Nitya,
+  'Shibu Rangarajan': IMG_Shibu,
+  'Moorty Perepa': IMG_Moorty,
+}
+
+// Map normalized filenames (lowercased) to imported assets
+const crewAssetByFile: Record<string, StaticImageData> = {
+  'bhuvi bagga.jpeg': IMG_Bhuvi,
+  'tanisha reddy.jpeg': IMG_Tanisha,
+  'naveen selvaraj.jpg': IMG_Naveen,
+  'dhruv maheshwari.jpg': IMG_Dhruv,
+  'abhigyan.jpg': IMG_Abhigyan,
+  'aarush khullar.jpg': IMG_Aarush,
+  'yadunandan reddy.jpg': IMG_Yadunandan,
+  'bhuvigna reddy.jpg': IMG_Bhuvigna,
+  'miruthulaa.jpg': IMG_Miruthulaa,
+  'hita shree.jpg': IMG_Hita,
+  'architha sp.jpg': IMG_Architha,
+  'nitya kushwaha.jpg': IMG_Nitya,
+  'shibu.jpg': IMG_Shibu,
+  'moorty.jpg': IMG_Moorty,
+}
+
+function resolveMemberImage(member: TeamMember): StaticImageData | string {
+  // Try to match by provided photo_url filename (case-insensitive)
+  const filename = member.photo_url ? member.photo_url.split('/').pop()?.toLowerCase() : undefined
+  if (filename && crewAssetByFile[filename]) {
+    return crewAssetByFile[filename]
+  }
+  // Fallback by name mapping
+  const byName = crewImages[member.name]
+  if (byName) return byName
+  // Final fallback
+  return '/images/Logo.png'
+}
 
 export default function CrewPage() {
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Changed to false so page shows immediately
   const [headerRef, headerInView] = useInView({ triggerOnce: true, threshold: 0.1 })
 
   useEffect(() => {
@@ -62,7 +109,9 @@ export default function CrewPage() {
   }, [])
 
   // Segregation logic
-  const coreMembers = teamMembers.filter(m => m.role === 'Club Head')
+  const coreMembers = teamMembers.filter(m => 
+    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core'
+  )
   const crewMembers = teamMembers.filter(m => m.role === 'Member')
   const newRecruits = teamMembers.filter(m => m.role === 'New Recruit')
   const oldCrew = teamMembers.filter(m => m.role === 'Old Crew')
@@ -306,8 +355,8 @@ export default function CrewPage() {
 }
 
 function CrewCard({ member, index }: { member: TeamMember, index: number }) {
-  const [imgError, setImgError] = useState(false);
-    const imgSrc = (crewImages as Record<string, string>)[member.name] || '/assets/team/placeholder-avatar.jpg';
+  const [imgError, setImgError] = useState(false)
+  const imgSrc = resolveMemberImage(member)
   return (
     <motion.div
       layout
@@ -346,11 +395,14 @@ function CrewCard({ member, index }: { member: TeamMember, index: number }) {
           </div>
         </div>
         {!imgError ? (
-          <img
+          <Image
             src={imgSrc}
             alt={member.name}
-            className="w-full h-full object-cover z-0"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover z-0"
             onError={() => setImgError(true)}
+            priority={index < 6}
           />
         ) : (
           <div className="w-full h-full bg-gray-700 flex items-center justify-center relative z-0">

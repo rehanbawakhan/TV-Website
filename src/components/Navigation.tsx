@@ -42,69 +42,31 @@ export default function Navigation() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo with Enhanced Hover Effects */}
-            <TransitionLink href="/" className="flex items-center space-x-4">
-              {/* Vegavath Logo from public/images */}
-              <motion.div
-                className="w-12 h-12 relative flex-shrink-0"
-                whileHover={{ 
-                  scale: 1.15, 
-                  rotate: 10,
-                  filter: 'drop-shadow(0 0 10px rgba(255, 107, 53, 0.8))'
-                }}
-                whileTap={{ scale: 0.95 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <Image
-                  src="/images/logo.png"
-                  alt="Vegavath Logo"
-                  width={50}
-                  height={50}
-                  className="object-contain"
-                  priority
-                />
-                {/* Holographic ring effect */}
-                <motion.div
-                  className="absolute inset-0 border-2 border-primary-orange/30 rounded-full"
-                  initial={{ scale: 0, opacity: 0 }}
-                  whileHover={{ 
-                    scale: 1.3, 
-                    opacity: [0, 1, 0],
-                    rotate: 360
-                  }}
-                  transition={{ 
-                    duration: 0.8,
-                    ease: "easeOut"
-                  }}
-                />
-              </motion.div>
-              
-              <motion.div
-                className="text-2xl font-heading font-bold text-transparent bg-clip-text bg-gradient-orange relative modern-title"
-                whileHover={{ 
-                  scale: 1.05,
-                  textShadow: '0 0 20px rgba(255, 107, 53, 0.8)'
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                VEGAVATH
-                {/* Digital glitch effect */}
-                <motion.div
-                  className="absolute inset-0 text-primary-orange opacity-0"
-                  whileHover={{ 
-                    opacity: [0, 0.3, 0],
-                    x: [0, 2, -2, 0]
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
+            <Link href="/">
+              <div className="flex flex-row items-center gap-3 md:gap-4 cursor-pointer">
+                {/* Vegavath Logo from public/images */}
+                <div className="w-10 h-10 md:w-12 md:h-12 relative flex-shrink-0">
+                  <Image
+                    src="/images/Logo.png"
+                    alt="Vegavath Logo"
+                    fill
+                    sizes="(max-width: 768px) 40px, 48px"
+                    className="object-contain"
+                    priority
+                    quality={100}
+                  />
+                </div>
+                
+                <div className="text-xl md:text-2xl font-heading font-bold text-transparent bg-clip-text bg-gradient-orange flex-shrink-0">
                   VEGAVATH
-                </motion.div>
-              </motion.div>
-            </TransitionLink>
+                </div>
+              </div>
+            </Link>
 
             {/* Enhanced Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
               {navItems.map((item, index) => (
-                <TransitionLink
+                <Link
                   key={item.name}
                   href={item.href}
                   className="relative text-white hover:text-primary-orange transition-colors duration-300 group modern-body"
@@ -157,7 +119,7 @@ export default function Navigation() {
                     }}
                     transition={{ duration: 0.3 }}
                   />
-                </TransitionLink>
+                </Link>
               ))}
             </div>
 
@@ -202,13 +164,13 @@ export default function Navigation() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <TransitionLink
+                    <Link
                       href={item.href}
                       className="block px-4 py-2 text-white hover:text-orange-500 hover:bg-orange-500/10 rounded-lg transition-all duration-300"
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
                       {item.name}
-                    </TransitionLink>
+                    </Link>
                   </motion.div>
                 ))}
               </div>
@@ -216,6 +178,8 @@ export default function Navigation() {
           )}
         </AnimatePresence>
       </motion.nav>
+      {/* Spacer to offset the fixed navbar height */}
+      <div aria-hidden="true" className="h-16" />
     </>
   )
 }

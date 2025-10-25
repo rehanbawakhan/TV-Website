@@ -1,8 +1,22 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useMemo } from 'react'
 
 export default function HolographicBackground() {
+  // Generate deterministic particle positions and timings to avoid hydration mismatches
+  const particles = useMemo(() => {
+    const seeded = (n: number) => {
+      const x = Math.sin(n * 12.9898) * 43758.5453
+      return x - Math.floor(x)
+    }
+    return Array.from({ length: 30 }, (_, i) => ({
+      left: `${(seeded(i) * 100).toFixed(6)}%`,
+      top: `${(seeded(i + 101) * 100).toFixed(6)}%`,
+      duration: 5 + seeded(i + 202) * 3,
+      delay: seeded(i + 303) * 5,
+    }))
+  }, [])
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
       {/* Base holographic gradient */}
@@ -46,13 +60,13 @@ export default function HolographicBackground() {
       />
 
       {/* Floating particles */}
-      {[...Array(30)].map((_, i) => (
+      {particles.map((p, i) => (
         <motion.div
           key={i}
           className="absolute w-1 h-1 bg-cyan-400 rounded-full"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: p.left,
+            top: p.top,
           }}
           animate={{
             y: [0, -100],
@@ -60,9 +74,9 @@ export default function HolographicBackground() {
             scale: [0, 1, 0],
           }}
           transition={{
-            duration: 5 + Math.random() * 3,
+            duration: p.duration,
             repeat: Infinity,
-            delay: Math.random() * 5,
+            delay: p.delay,
           }}
         />
       ))}
