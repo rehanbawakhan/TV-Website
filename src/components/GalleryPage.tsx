@@ -116,18 +116,7 @@ export default function GalleryPage() {
       {/* Hero Section */}
       <section ref={headerRef} className="pt-20 pb-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
-            {/* Frosted overlay + Under Maintenance badge */}
-            <div className="absolute top-6 right-6 z-30">
-              <div className="bg-white/6 backdrop-blur-md border border-white/10 rounded-lg px-3 py-2 flex items-center space-x-3">
-                <motion.div
-                  animate={{ opacity: [1, 0.25, 1], scale: [1, 0.98, 1] }}
-                  transition={{ duration: 2.2, repeat: Infinity }}
-                  className="px-3 py-1 rounded-full bg-red-600 text-white text-sm font-semibold shadow-lg"
-                >
-                  Under Maintenance
-                </motion.div>
-              </div>
-            </div>
+          {/* Under-maintenance badge removed — overlay controlled by admin */}
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}

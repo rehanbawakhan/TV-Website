@@ -35,21 +35,7 @@ export default function HeroSection() {
         {/* Soft dark overlay + subtle blur to make foreground readable */}
         <div className="absolute inset-0 z-10 bg-black/30 backdrop-blur-sm" />
 
-        {/* Coming Soon Badge - Top Right */}
-        <motion.div 
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="absolute top-24 right-6 z-20 px-4 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-md border border-orange-500/30 rounded-full shadow-lg"
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🏎️</span>
-            <div className="text-xs text-gray-200">
-              <div className="font-semibold">3D Model</div>
-              <div className="text-gray-400">Coming Soon</div>
-            </div>
-          </div>
-        </motion.div>
+        {/* removed: 3D Model badge moved to Interactive Tech section */}
       </div>
 
       {/* Enhanced Content Overlay */}

@@ -337,7 +337,21 @@ export default function ScrollingSection() {
                   Interactive Tech
                 </span>
               </h3>
-              <Interactive3DScene />
+              {/* Floating badge for the 3D Model (moved from hero) */}
+              <div className="relative">
+                <div className="absolute top-4 right-4 z-20">
+                  <div className="px-3 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-md border border-orange-500/30 rounded-full shadow-lg">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">🏎️</span>
+                      <div className="text-xs text-gray-200">
+                        <div className="font-semibold">3D Model</div>
+                        <div className="text-gray-400">Coming Soon</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <Interactive3DScene />
+              </div>
             </div>
           </motion.div>
         </motion.div>

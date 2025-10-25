@@ -21,6 +21,8 @@ import IMG_Architha from '@/lib/crewimg/Architha SP.jpg'
 import IMG_Nitya from '@/lib/crewimg/Nitya Kushwaha.jpg'
 import IMG_Shibu from '@/lib/crewimg/Shibu.jpg'
 import IMG_Moorty from '@/lib/crewimg/Moorty.jpg'
+import IMG_Kedar from '@/lib/crewimg/Kedar.jpg'
+import IMG_Sharanya from '@/lib/crewimg/Sharanya N.jpg'
 
 const domainColors = {
   Automotive: 'from-orange-500 to-red-600',
@@ -55,6 +57,8 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Nitya Kushwaha': IMG_Nitya,
   'Shibu Rangarajan': IMG_Shibu,
   'Moorty Perepa': IMG_Moorty,
+  'Kedar': IMG_Kedar,
+  'Sharanya N': IMG_Sharanya,
 }
 
 // Map normalized filenames (lowercased) to imported assets
@@ -73,6 +77,8 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'nitya kushwaha.jpg': IMG_Nitya,
   'shibu.jpg': IMG_Shibu,
   'moorty.jpg': IMG_Moorty,
+  'kedar.jpg': IMG_Kedar,
+  'sharanya n.jpg': IMG_Sharanya,
 }
 
 function resolveMemberImage(member: TeamMember): StaticImageData | string {
