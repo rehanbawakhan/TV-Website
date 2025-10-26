@@ -79,7 +79,7 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'nitya kushwaha.jpg': IMG_Nitya,
   'shibu.jpg': IMG_Shibu,
   'moorty.jpg': IMG_Moorty,
-  'kedar.jpg': IMG_Keshav,
+  'keshav.jpg': IMG_Keshav,
   'sharanya n.jpg': IMG_Sharanya,
   'karan.jpg': IMG_Karan,
 }
