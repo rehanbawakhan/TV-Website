@@ -247,7 +247,7 @@ export default function ScrollingSection() {
 
             <div className="flex items-center justify-center gap-4">
               <motion.a
-                href="/hackathon"
+                href="/ignition"
                 className="group relative inline-block px-8 py-4 bg-gradient-orange text-white font-semibold rounded-lg overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/25"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

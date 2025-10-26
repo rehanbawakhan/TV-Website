@@ -456,7 +456,7 @@ export default function GuidelinesPage() {
                 boxShadow: '0 10px 30px rgba(59, 130, 246, 0.3)'
               }}
               whileTap={{ scale: 0.98 }}
-              onClick={() => window.location.href = '/hackathon'}
+              onClick={() => window.location.href = '/ignition'}
             >
               <span className="relative z-10">🏁 Register for VegaHack</span>
               <motion.div 
