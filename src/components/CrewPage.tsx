@@ -22,8 +22,8 @@ import IMG_Nitya from '@/lib/crewimg/Nitya Kushwaha.jpg'
 import IMG_Shibu from '@/lib/crewimg/Shibu.jpg'
 import IMG_Moorty from '@/lib/crewimg/Moorty.jpg'
 import IMG_Keshav from '@/lib/crewimg/Keshav.jpg'
-import IMG_Sharanya from '@/lib/crewimg/Sharanya N.jpg'
-import IMG_Sid from '@/lib/crewimg/Sid.png'
+import IMG_Sharanya from '@/lib/crewimg/Sharanya.jpg'
+import IMG_Manish from '@/lib/crewimg/Manish.png'
 import IMG_Karan from '@/lib/crewimg/Karan.jpg'
 
 const domainColors = {
@@ -48,7 +48,7 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Velkur Tanisha Reddy': IMG_Tanisha,
   'Naveen S': IMG_Naveen,
   'Dhruv Maheshwari': IMG_Dhruv,
-  'Siddharth Shilin': IMG_Sid,
+  'Siddharth Shilin': IMG_Manish,
   'Abhigyan': IMG_Abhigyan,
   'Aarush Khullar': IMG_Aarush,
   'Yadunandana Reddy M': '/images/Logo.png',
@@ -61,6 +61,7 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Moorty Perepa': IMG_Moorty,
   'Keshav': IMG_Keshav,
   'Sharanya N': IMG_Sharanya,
+  'Sharanya': IMG_Sharanya,
 }
 
 // Map normalized filenames (lowercased) to imported assets
@@ -81,6 +82,7 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'moorty.jpg': IMG_Moorty,
   'keshav.jpg': IMG_Keshav,
   'sharanya n.jpg': IMG_Sharanya,
+  'sharanya.jpg': IMG_Sharanya,
   'karan.jpg': IMG_Karan,
 }
 
