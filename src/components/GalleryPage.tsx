@@ -176,6 +176,15 @@ export default function GalleryPage() {
         </div>
       </section>
 
+      {/* Page Under Maintenance Message - moved slightly lower */}
+      <div className="flex justify-center mt-24 mb-8">
+        <div className="bg-orange-500/10 border border-orange-400/30 rounded-xl px-8 py-6 shadow-lg backdrop-blur-md">
+          <span className="text-orange-300 text-lg font-semibold tracking-wide flex items-center gap-2">
+            🚧 Page under Maintenance
+          </span>
+        </div>
+      </div>
+
       {/* Gallery Grid */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">

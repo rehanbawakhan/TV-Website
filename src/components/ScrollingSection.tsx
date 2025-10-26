@@ -7,14 +7,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 // Dynamic import to avoid SSR issues with React Three Fiber
-const Interactive3DScene = dynamic(() => import('./Interactive3DScene'), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full h-96 bg-gradient-to-br from-gray-900/50 to-gray-800/50 rounded-xl border border-primary-orange/30 flex items-center justify-center">
-      <div className="text-primary-orange text-lg modern-body">Loading Interactive 3D Scene...</div>
-    </div>
-  )
-})
 
 export default function ScrollingSection() {
   const { scrollY } = useScroll()
@@ -312,20 +304,21 @@ export default function ScrollingSection() {
                   Interactive Tech
                 </span>
               </h3>
-              {/* Floating badge for the 3D Model (moved from hero) */}
+              {/* Overlay badge for the 3D Model Coming Soon */}
               <div className="relative">
-                <div className="absolute top-4 right-4 z-20">
-                  <div className="px-3 py-2 bg-gradient-to-r from-orange-500/20 to-red-500/20 backdrop-blur-md border border-orange-500/30 rounded-full shadow-lg">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">🏎️</span>
-                      <div className="text-xs text-gray-200">
-                        <div className="font-semibold">3D Model</div>
-                        <div className="text-gray-400">Coming Soon</div>
-                      </div>
+                {/* Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
+                  <div className="px-6 py-4 bg-gradient-to-r from-orange-500/30 to-red-500/30 backdrop-blur-xl border border-orange-500/40 rounded-2xl shadow-2xl flex items-center gap-4 animate-pulse">
+                    <span className="text-3xl">🏎️</span>
+                    <div className="text-base text-gray-100">
+                      <div className="font-bold tracking-wide">3D Model</div>
+                      <div className="text-orange-200 font-semibold">Coming Soon</div>
                     </div>
                   </div>
                 </div>
-                <Interactive3DScene />
+                {/* (3D scene would be here) */}
+                {/* <Interactive3DScene /> */}
+                <div className="opacity-40 select-none" style={{height: '220px'}}></div>
               </div>
             </div>
           </motion.div>

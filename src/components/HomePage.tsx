@@ -23,7 +23,7 @@ export default function HomePage() {
     // Show loading screen and mark as seen
     sessionStorage.setItem('vegavath-loading-seen', 'true')
     
-    // Simulate loading time for 3D assets - matches loading screen timing
+  // ...3D asset loading simulation removed...
     const timer = setTimeout(() => {
       setIsLoading(false)
     }, 4000) // Updated to 4 seconds to match faster loading screen
