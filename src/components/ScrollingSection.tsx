@@ -151,15 +151,15 @@ export default function ScrollingSection() {
             className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center"
           >
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary-orange font-heading">50+</div>
+              <div className="text-3xl font-bold text-primary-orange font-heading">96</div>
               <div className="text-gray-400 modern-body">Active Members</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary-orange font-heading">25+</div>
+              <div className="text-3xl font-bold text-primary-orange font-heading">8</div>
               <div className="text-gray-400 modern-body">Projects Completed</div>
             </div>
             <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary-orange font-heading">5</div>
+              <div className="text-3xl font-bold text-primary-orange font-heading">4</div>
               <div className="text-gray-400 modern-body">Technical Domains</div>
             </div>
           </motion.div>
@@ -230,7 +230,7 @@ export default function ScrollingSection() {
             </h2>
 
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Join us for the ultimate 24-hour coding and hardware marathon! Experience the thrill of 
+              Join us for the ultimate 18-hour coding and hardware marathon! Experience the thrill of 
               innovation, where the fastest minds race against time to build 
               groundbreaking solutions. Rev up your engines for Ignition 1.0, on 7th and 8th November, 2025!
             </p>
@@ -238,7 +238,7 @@ export default function ScrollingSection() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🏁</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">24 Hours</h3>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">18 Hours</h3>
                 <p className="text-gray-400 text-sm">A Fun coding sprint</p>
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
@@ -248,8 +248,8 @@ export default function ScrollingSection() {
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🎯</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">3 Tracks</h3>
-                <p className="text-gray-400 text-sm">Multiple tracks</p>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">Fun Events</h3>
+                <p className="text-gray-400 text-sm">Exciting Goodies</p>
               </div>
             </div>
 
@@ -304,31 +304,6 @@ export default function ScrollingSection() {
                 }}
               />
             </div>
-            
-            {/* Carbon fiber pattern overlay */}
-            <div className="absolute inset-0 opacity-8 rounded-xl">
-              <div 
-                className="w-full h-full rounded-xl"
-                style={{
-                  backgroundImage: `
-                    repeating-linear-gradient(
-                      0deg,
-                      transparent,
-                      transparent 2px,
-                      rgba(0, 255, 255, 0.08) 2px,
-                      rgba(0, 255, 255, 0.08) 4px
-                    ),
-                    repeating-linear-gradient(
-                      90deg,
-                      transparent,
-                      transparent 2px,
-                      rgba(0, 255, 255, 0.08) 2px,
-                      rgba(0, 255, 255, 0.08) 4px
-                    )
-                  `
-                }}
-              />
-            </div>
 
             <div className="relative z-10">
               <h3 className="text-2xl font-bold text-white text-center mb-8">
@@ -356,9 +331,6 @@ export default function ScrollingSection() {
           </motion.div>
         </motion.div>
       </section>
-
-      {/* Spacer Section */}
-      <section className="py-16"></section>
 
       {/* CTA Section */}
       <section className="flex items-center justify-center px-4 py-16 relative">

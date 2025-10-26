@@ -1,6 +1,6 @@
 {
   "maintenance": {
-    "about": false,
-    "gallery": false
+    "about": true,
+    "gallery": true
   }
 }

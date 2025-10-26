@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Navigation from '../../components/Navigation'
 import toast from 'react-hot-toast'
@@ -26,7 +26,7 @@ interface FormData {
   idea: string
   campus?: string
   proposalPdf?: File | null
-  paymentScreenshot?: File | null
+  
 }
 
 export default function HackathonRegister() {
@@ -47,7 +47,7 @@ export default function HackathonRegister() {
     ,
     campus: '',
     proposalPdf: null,
-    paymentScreenshot: null
+    
   })
 
   const handleNext = () => {
@@ -92,8 +92,6 @@ export default function HackathonRegister() {
       })
 
       const proposalData = await fileToDataUrl((formData as any).proposalPdf)
-      const paymentData = await fileToDataUrl((formData as any).paymentScreenshot)
-
       const payload = {
         teamName: formData.teamName,
         teamLeader: formData.teamLeader,
@@ -104,7 +102,6 @@ export default function HackathonRegister() {
         experience: formData.experience,
         idea: formData.idea,
         proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
-        paymentScreenshot: paymentData ? { name: (formData as any).paymentScreenshot.name, data: paymentData } : null,
       }
 
       const res = await fetch('/api/hackathon/register', {
@@ -123,6 +120,24 @@ export default function HackathonRegister() {
       toast.error('Failed to submit registration. Please try again.')
     }
   }
+
+  const [paymentPortalUrl, setPaymentPortalUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/site/settings')
+        if (!res.ok) return
+        const json = await res.json()
+        if (!mounted) return
+        setPaymentPortalUrl(json.paymentPortalUrl || null)
+      } catch (e) {
+        // ignore
+      }
+    })()
+    return () => { mounted = false }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-black">
@@ -370,10 +385,7 @@ export default function HackathonRegister() {
                     ))}
                   </div>
                   
-                  <div className="text-center pt-4">
-                    <p className="text-2xl font-bold text-orange-500">Registration Fee: ₹500</p>
-                    <p className="text-gray-400 text-sm">per team</p>
-                  </div>
+                  {/* Registration fee text removed per admin request */}
 
                   {/* File uploads: Proposed Solution PDF and Payment Screenshot */}
                   <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -391,35 +403,11 @@ export default function HackathonRegister() {
                       <div className="mt-2 text-xs text-gray-400">Upload a single PDF containing your proposed solution.</div>
                     </div>
 
-                    <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
-                      <label className="block text-sm text-gray-300 mb-2">Payment Screenshot (Image)</label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] || null
-                          setFormData({...formData, paymentScreenshot: file})
-                        }}
-                        className="w-full text-sm text-gray-300"
-                      />
-                      <div className="mt-2 text-xs text-gray-400">Upload a screenshot of your payment confirmation.</div>
-                    </div>
+                    {/* payment screenshot removed per request */}
                   </div>
 
                   {/* Simple diff panel showing uploaded file info */}
-                  <div className="mt-4 p-4 border border-gray-700 rounded-lg bg-gray-900/30">
-                    <h4 className="text-white font-semibold mb-2">Uploaded Files (Diff Panel)</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="text-sm text-gray-300">
-                        <div className="font-medium">Proposal PDF</div>
-                        <div className="text-xs text-gray-400">{(formData as any).proposalPdf ? (formData as any).proposalPdf.name : 'No file uploaded'}</div>
-                      </div>
-                      <div className="text-sm text-gray-300">
-                        <div className="font-medium">Payment Screenshot</div>
-                        <div className="text-xs text-gray-400">{(formData as any).paymentScreenshot ? (formData as any).paymentScreenshot.name : 'No file uploaded'}</div>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Uploaded files summary removed per request */}
                 </div>
               </div>
             )}
@@ -437,11 +425,20 @@ export default function HackathonRegister() {
                     Complete your registration with secure payment
                   </p>
                   <div className="bg-gradient-orange p-8 rounded-xl text-white">
-                    <h3 className="text-xl font-semibold mb-4">Payment Details</h3>
-                    <p className="mb-2">Amount: ₹500</p>
+                    <h3 className="text-xl font-semibold mb-4">Payment</h3>
+                    <p className="mb-4">Complete your registration payment using the organiser's payment portal.</p>
                     <p className="mb-6">Team: {formData.teamName}</p>
-                    <button className="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                      Pay with Razorpay
+                    <button
+                      onClick={() => {
+                        if (paymentPortalUrl) {
+                          window.open(paymentPortalUrl, '_blank')
+                        } else {
+                          toast.error('Payment portal not configured. Please contact the organisers.')
+                        }
+                      }}
+                      className="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    >
+                      Open Payment Portal
                     </button>
                   </div>
                 </motion.div>

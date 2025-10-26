@@ -5,16 +5,15 @@ import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
 
 const sections = [
-  {
-    title: 'Competition Overview',
-    icon: '🏁',
-    content: [
-      'VegaHack is a 48-hour racing-themed hackathon where innovation meets velocity',
-      'Teams can have up to 4 members including the team leader',
-      'Registration fee: ₹500 per team (covers meals, swag, and workspace)',
-      'Winners will receive cash prizes, certificates, and exclusive internship opportunities'
-    ]
-  },
+      {
+        title: 'Competition Overview',
+        icon: '🏁',
+        content: [
+          'VegaHack is a 48-hour racing-themed hackathon where innovation meets velocity',
+          'Teams can have up to 4 members including the team leader',
+          'Winners will receive cash prizes, certificates, and exclusive internship opportunities'
+        ]
+      },
   {
     title: 'Eligibility Criteria',
     icon: '🏎️',

@@ -65,7 +65,6 @@ export default function AdminRegistrationsPage() {
       'Experience',
       'Idea',
       'Proposal URL',
-      'Payment URL',
       'Created At',
     ]
 
@@ -79,7 +78,6 @@ export default function AdminRegistrationsPage() {
       r.experience ?? '',
       r.idea ?? '',
       r.proposal_pdf_url ?? '',
-      r.payment_screenshot_url ?? '',
       r.created_at ?? '',
     ])
 
@@ -174,7 +172,6 @@ export default function AdminRegistrationsPage() {
                 <th className="px-4 py-2 text-left">Email</th>
                 <th className="px-4 py-2 text-left">Members</th>
                 <th className="px-4 py-2 text-left">Proposal</th>
-                <th className="px-4 py-2 text-left">Payment</th>
                 <th className="px-4 py-2 text-left">Created</th>
               </tr>
             </thead>
@@ -188,11 +185,6 @@ export default function AdminRegistrationsPage() {
                   <td className="px-4 py-2">
                     {r.proposal_pdf_url ? (
                       <a className="text-indigo-600 underline" href={r.proposal_pdf_url} target="_blank" rel="noreferrer">View Proposal</a>
-                    ) : '—'}
-                  </td>
-                  <td className="px-4 py-2">
-                    {r.payment_screenshot_url ? (
-                      <a className="text-indigo-600 underline" href={r.payment_screenshot_url} target="_blank" rel="noreferrer">View Payment</a>
                     ) : '—'}
                   </td>
                   <td className="px-4 py-2 text-sm">{new Date(r.created_at || '').toLocaleString()}</td>

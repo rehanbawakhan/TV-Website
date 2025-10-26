@@ -93,14 +93,14 @@ export default function PageTransition({ children }: { children: React.ReactNode
             initial="initial"
             animate="loading"
             exit="complete"
-            variants={loadingVariants}
+            variants={loadingVariants as any}
           >
             <div className="h-full bg-gradient-to-r from-primary-orange via-primary-orangeDark to-primary-orange shadow-lg shadow-primary-orange/50" />
             
             {/* Scanning overlay effect */}
             <motion.div
               className="absolute inset-0 h-full"
-              variants={overlayVariants}
+              variants={overlayVariants as any}
               initial="initial"
               animate="animate"
             />
@@ -112,7 +112,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
           key={pathname}
-          variants={pageVariants}
+          variants={pageVariants as any}
           initial="initial"
           animate="enter"
           exit="exit"

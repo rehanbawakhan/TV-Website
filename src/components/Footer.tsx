@@ -2,12 +2,12 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const socialLinks = [
-  { name: 'LinkedIn', icon: '💼', href: 'https://www.linkedin.com/company/team-vegavath-racing/', color: 'hover:text-primary-orange' },
-  { name: 'Instagram', icon: '📷', href: 'https://www.instagram.com/teamvegavath_pesu/', color: 'hover:text-primary-orange' },
-  { name: 'GitHub', icon: '💻', href: 'https://github.com/Team-Vegavath', color: 'hover:text-gray-300' },
-  { name: 'YouTube', icon: '📺', href: '#', color: 'hover:text-primary-orangeDark' },
+  { name: 'LinkedIn', href: 'https://www.linkedin.com/company/team-vegavath-racing/', color: 'hover:text-primary-orange' },
+  { name: 'Instagram', href: 'https://www.instagram.com/teamvegavath_pesu/', color: 'hover:text-primary-orange' },
+  { name: 'GitHub', href: 'https://github.com/Team-Vegavath', color: 'hover:text-gray-300' },
 ]
 
 const quickLinks = [
@@ -121,7 +121,15 @@ export default function Footer() {
                     className={`w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 ${social.color} transition-all duration-300 hover:scale-110 hover:bg-gray-700`}
                     title={social.name}
                   >
-                    <span className="text-lg">{social.icon}</span>
+                    {social.name === 'LinkedIn' && (
+                      <Image src="/icons/linkedin.png" alt="LinkedIn" width={20} height={20} />
+                    )}
+                    {social.name === 'Instagram' && (
+                      <Image src="/icons/instagram.png" alt="Instagram" width={20} height={20} />
+                    )}
+                    {social.name === 'GitHub' && (
+                      <Image src="/icons/github.png" alt="GitHub" width={20} height={20} />
+                    )}
                   </a>
                 ))}
               </div>

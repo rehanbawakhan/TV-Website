@@ -16,7 +16,6 @@ export async function POST(req: Request) {
       experience,
       idea,
       proposalPdf,
-      paymentScreenshot,
     } = body
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
@@ -53,9 +52,7 @@ export async function POST(req: Request) {
       if (proposalPdf) {
         proposalUrl = await uploadBase64('hackathon', `${teamName}_proposal`, proposalPdf)
       }
-      if (paymentScreenshot) {
-        paymentUrl = await uploadBase64('hackathon', `${teamName}_payment`, paymentScreenshot)
-      }
+      // payment screenshot handling removed (client no longer sends this)
     } catch (err) {
       console.error('Upload error:', err)
       return NextResponse.json({ error: 'File upload failed' }, { status: 500 })
@@ -72,7 +69,6 @@ export async function POST(req: Request) {
       experience: experience || null,
       idea: idea || null,
       proposal_pdf_url: proposalUrl,
-      payment_screenshot_url: paymentUrl,
     }
 
     const { data, error } = await supabaseAdmin
