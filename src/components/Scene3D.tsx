@@ -1,5 +1,5 @@
 
-'// @ts-nocheck
+// @ts-nocheck
 'use client'
 
 // Temporary: disable TypeScript checking for this file to avoid JSX intrinsic
