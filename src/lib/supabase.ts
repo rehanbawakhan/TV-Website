@@ -156,7 +156,7 @@ export async function getTeamMembers() {
         role: 'Member',
         domain: 'Logistics',
         bio: 'Came for the cars, stayed for the chaos.',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        photo_url: getCrewImagePath('Sid.png'),
         created_at: new Date().toISOString(),
       },
       {
@@ -264,7 +264,7 @@ export async function getTeamMembers() {
         role: 'Member',
         domain: 'Programming',
         bio: 'Fill in Later',
-        photo_url: '/assets/team/placeholder-avatar.jpg',
+        photo_url: getCrewImagePath('Manish.png'),
         created_at: new Date().toISOString(),
       },
       // New Recruits
@@ -279,15 +279,17 @@ export async function getTeamMembers() {
         photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
+      // Old Crew
       {
         id: 'oc-2',
         name: 'Shibu Rangarajan',
-        role: 'Legacy Core',
+        role: 'Old Crew',
         domain: 'Automotive',
         bio: 'Idk man put off smn',
         photo_url: getCrewImagePath('Shibu.jpg'),
         created_at: new Date().toISOString(),
       },
+// Crew image tile size recommendation: 1:1 aspect ratio, e.g. 600x600px or 800x800px for best fit in the UI.
     ] as TeamMember[]
   }
 }

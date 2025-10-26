@@ -8,7 +8,14 @@ import Navigation from './Navigation'
 import { getTeamMembers, TeamMember } from '@/lib/supabase'
 // Import crew images so the bundler serves them (files live in src/lib/crewimg)
 import IMG_Bhuvi from '@/lib/crewimg/Bhuvi Bagga.jpeg'
+import IMG_Ankush from '@/lib/crewimg/Ankush.jpg'
 import IMG_Tanisha from '@/lib/crewimg/Tanisha Reddy.jpeg'
+import IMG_Tvisha from '@/lib/crewimg/Tvisha.png'
+import IMG_Srijan from '@/lib/crewimg/Srijan.png'
+import IMG_Arun from '@/lib/crewimg/Arun.jpg'
+import IMG_Sid from '@/lib/crewimg/Sid.png'
+import IMG_Ragul from '@/lib/crewimg/Ragul Rajkumar.jpeg'
+import IMG_ShreyaRevankar from '@/lib/crewimg/Shreya Revankar.jpg'
 import IMG_Naveen from '@/lib/crewimg/Naveen Selvaraj.jpg'
 import IMG_Dhruv from '@/lib/crewimg/Dhruv Maheshwari.jpg'
 import IMG_Abhigyan from '@/lib/crewimg/Abhigyan.jpg'
@@ -32,14 +39,11 @@ const domainColors = {
   Design: 'from-orange-500 to-red-600',
   Media: 'from-orange-500 to-red-600',
   Marketing: 'from-purple-500 to-indigo-600',
-}
-
-const domainIcons = {
-  Automotive: '🏎️',
-  Robotics: '🤖',
-  Design: '🎨',
-  Media: '📸',
-  Marketing: '📈',
+  Sponsorships: 'from-yellow-500 to-orange-600',
+  Operations: 'from-blue-500 to-cyan-600',
+  Logistics: 'from-green-500 to-lime-600',
+  Programming: 'from-pink-500 to-fuchsia-600',
+  '3D Space': 'from-indigo-500 to-purple-600',
 }
 
 const crewImages: Record<string, StaticImageData | string> = {
@@ -48,7 +52,14 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Velkur Tanisha Reddy': IMG_Tanisha,
   'Naveen S': IMG_Naveen,
   'Dhruv Maheshwari': IMG_Dhruv,
-  'Siddharth Shilin': IMG_Manish,
+  'Siddharth Shilin': IMG_Sid,
+  'Maniish Rajendran': IMG_Manish,
+  'Ankush Gowda': IMG_Ankush,
+  'Tvisha': IMG_Tvisha,
+  'Srijan Das': IMG_Srijan,
+  'Arun Murugappan I': IMG_Arun,
+  'Ragul Rajkumar': IMG_Ragul,
+  'Shreya Revankar': IMG_ShreyaRevankar,
   'Abhigyan': IMG_Abhigyan,
   'Aarush Khullar': IMG_Aarush,
   'Yadunandana Reddy M': IMG_Yadunandan,
@@ -66,6 +77,11 @@ const crewImages: Record<string, StaticImageData | string> = {
 
 // Map normalized filenames (lowercased) to imported assets
 const crewAssetByFile: Record<string, StaticImageData> = {
+  'tvisha.jpg': IMG_Tvisha,
+  'srijan.jpg': IMG_Srijan,
+  'arun.jpg': IMG_Arun,
+  'ragul rajkumar.jpeg': IMG_Ragul,
+  'shreya revankar.jpg': IMG_ShreyaRevankar,
   'bhuvi bagga.jpeg': IMG_Bhuvi,
   'tanisha reddy.jpeg': IMG_Tanisha,
   'naveen selvaraj.jpg': IMG_Naveen,
@@ -84,6 +100,9 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'sharanya n.jpg': IMG_Sharanya,
   'sharanya.jpg': IMG_Sharanya,
   'karan.jpg': IMG_Karan,
+  'ankush.jpg': IMG_Ankush,
+  'sid.png': IMG_Sid,
+  'manish.png': IMG_Manish,
 }
 
 function resolveMemberImage(member: TeamMember): StaticImageData | string {
@@ -119,13 +138,13 @@ export default function CrewPage() {
     fetchTeamMembers()
   }, [])
 
-  // Segregation logic
+  // Segregation logic (updated to match supabase.ts fallback data)
   const coreMembers = teamMembers.filter(m => 
-    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core'
+    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core' || m.role === 'Club Manager' || m.role === 'Social Media Head' || m.role === 'Automotive Head'
   )
   const crewMembers = teamMembers.filter(m => m.role === 'Member')
   const newRecruits = teamMembers.filter(m => m.role === 'New Recruit')
-  const oldCrew = teamMembers.filter(m => m.role === 'Old Crew')
+  const oldCrew = teamMembers.filter(m => m.role === 'Club Head 25' || m.role === 'Old Crew')
 
   if (loading) {
     return (
@@ -379,7 +398,7 @@ function CrewCard({ member, index }: { member: TeamMember, index: number }) {
         transition={{ duration: 0.8, delay: index * 0.1 + 0.3 }}
       />
       {/* Enhanced Profile Image */}
-      <div className="relative h-64 bg-gray-800 overflow-hidden">
+      <div className="relative h-64 bg-gray-800 overflow-hidden pt-4 pr-4">
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
         {/* Holographic grid overlay */}
         <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity z-5">
@@ -414,16 +433,10 @@ function CrewCard({ member, index }: { member: TeamMember, index: number }) {
             </motion.span>
           </div>
         )}
-        {/* Enhanced Domain Badge */}
-        <div className="absolute top-4 right-4 z-20">
-          <span className={`px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${domainColors[member.domain as keyof typeof domainColors]} text-white relative overflow-hidden transition-shadow duration-200`}> 
-            <motion.span
-              animate={{ rotateY: [0, 360] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              {domainIcons[member.domain as keyof typeof domainIcons]}
-            </motion.span>
-            {' '}{member.domain}
+        {/* Domain Badge (no emoji) */}
+        <div className="absolute top-2 right-2 z-20">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${domainColors[member.domain as keyof typeof domainColors] || 'from-gray-500 to-gray-700'} text-white relative overflow-hidden transition-shadow duration-200 shadow-md`}> 
+            {member.domain}
             {/* Scan line effect */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
@@ -462,7 +475,7 @@ function CrewCard({ member, index }: { member: TeamMember, index: number }) {
           </div>
         </div>
         <h3 className="text-xl font-bold text-white mb-2 relative z-10 transition-transform duration-200 group-hover:translate-x-1">
-          {member.name}
+          {member.name === 'Siddharth Shilin' ? 'Siddharth Shilin' : member.name}
         </h3>
         <p className="text-orange-500 font-medium mb-3 relative z-10 transition-transform duration-200 group-hover:translate-x-1">
           {member.role}
