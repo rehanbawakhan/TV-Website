@@ -133,21 +133,6 @@ export default function Footer() {
                   </a>
                 ))}
               </div>
-
-              {/* Newsletter Signup */}
-              <div className="space-y-3">
-                <p className="text-gray-400 text-sm">Get racing updates & news</p>
-                <div className="flex space-x-2">
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    className="flex-1 px-3 py-2 bg-gray-800/50 border border-gray-600 rounded text-white text-sm placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-transparent"
-                  />
-                  <button className="px-4 py-2 bg-gradient-orange text-white text-sm font-medium rounded hover:scale-105 transition-transform duration-300">
-                    Join
-                  </button>
-                </div>
-              </div>
             </motion.div>
           </div>
         </div>
