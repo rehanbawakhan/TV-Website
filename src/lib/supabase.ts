@@ -47,7 +47,6 @@ export interface InterviewSlot {
   applicant_email?: string
   created_at: string
 }
-
 export interface HackathonRegistration {
   id: string
   team_name: string
@@ -89,6 +88,15 @@ export async function getTeamMembers() {
       },
       {
         id: 'core-2',
+        name: 'Ankush Gowda',
+        role: 'Club Manager',
+        domain: 'Marketing',
+        bio: 'Absolute Cinema',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'core-3',
         name: 'Dhruv Maheshwari',
         role: 'Design Head',
         domain: 'Automotive',
@@ -97,12 +105,21 @@ export async function getTeamMembers() {
         created_at: new Date().toISOString(),
       },
       {
-        id: 'core-3',
-        name: 'Shibu Rangarajan',
-        role: 'Legacy Core',
+        id: 'core-4',
+        name: 'Tvisha',
+        role: 'Social Media Head',
         domain: 'Media',
-        bio: 'Idk man put off smn',
-        photo_url: getCrewImagePath('Shibu.jpg'),
+        bio: 'Write off anything',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'core-5',
+        name: 'Srijan Das',
+        role: 'Automotive Head',
+        domain: 'Automotive',
+        bio: 'Driving a slow car fast is better than driving a fast car slow.',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
       // Crew
@@ -110,8 +127,8 @@ export async function getTeamMembers() {
         id: 'crew-1',
         name: 'Karan Maheshwari',
         role: 'Member',
-        domain: 'Automotive',
-        bio: '',
+        domain: 'Robotics',
+        bio: 'Life never gives you free lemons, it only gives Pain',
         photo_url: getCrewImagePath('Karan Maheshwari.jpg'),
         created_at: new Date().toISOString(),
       },
@@ -119,7 +136,7 @@ export async function getTeamMembers() {
         id: 'crew-2',
         name: 'Bhuvi Bagga',
         role: 'Member',
-        domain: 'Design',
+        domain: 'Sponsorships',
         bio: 'Powered by caffeine, creativity, and convincing emails. As a part of the sponsorship team, I make sure our passion gets the backing it deserves',
         photo_url: getCrewImagePath('Bhuvi Bagga.jpeg'),
         created_at: new Date().toISOString(),
@@ -128,7 +145,7 @@ export async function getTeamMembers() {
         id: 'crew-3',
         name: 'Velkur Tanisha Reddy',
         role: 'Member',
-        domain: 'Design',
+        domain: 'Operations',
         bio: 'Adventure awaits, fueled by adrenaline',
         photo_url: getCrewImagePath('Tanisha Reddy.jpeg'),
         created_at: new Date().toISOString(),
@@ -137,7 +154,7 @@ export async function getTeamMembers() {
         id: 'crew-5',
         name: 'Siddharth Shilin',
         role: 'Member',
-        domain: 'Robotics',
+        domain: 'Logistics',
         bio: 'Came for the cars, stayed for the chaos.',
         photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
@@ -146,7 +163,7 @@ export async function getTeamMembers() {
         id: 'crew-6',
         name: 'Abhigyan',
         role: 'Member',
-        domain: 'Robotics',
+        domain: 'Programming',
         bio: 'He who wasn\'t.',
         photo_url: getCrewImagePath('Abhigyan.jpg'),
         created_at: new Date().toISOString(),
@@ -164,7 +181,7 @@ export async function getTeamMembers() {
         id: 'crew-8',
         name: 'Yadunandana Reddy M',
         role: 'Member',
-        domain: 'Automotive',
+        domain: 'Design',
         bio: 'I touch photoshop',
         photo_url: getCrewImagePath('Yadunandan Reddy.JPG'),
         created_at: new Date().toISOString(),
@@ -182,7 +199,7 @@ export async function getTeamMembers() {
         id: 'crew-10',
         name: 'Miruthulaa E M',
         role: 'Member',
-        domain: 'Design',
+        domain: 'Robotics',
         bio: "If you're going hard enough left, you'll find yourself turning right.",
         photo_url: getCrewImagePath('Miruthulaa.jpg'),
         created_at: new Date().toISOString(),
@@ -191,7 +208,7 @@ export async function getTeamMembers() {
         id: 'crew-11',
         name: 'Hitha Shree Suresh',
         role: 'Member',
-        domain: 'Design',
+        domain: 'Marketing',
         bio: 'All eyes on KALESH',
         photo_url: getCrewImagePath('Hita Shree.jpg'),
         created_at: new Date().toISOString(),
@@ -200,7 +217,7 @@ export async function getTeamMembers() {
         id: 'crew-12',
         name: 'Architha',
         role: 'Member',
-        domain: 'Design',
+        domain: 'Marketing',
         bio: 'I am Kalesh',
         photo_url: getCrewImagePath('Architha SP.jpg'),
         created_at: new Date().toISOString(),
@@ -218,15 +235,59 @@ export async function getTeamMembers() {
         id: 'crew-15',
         name: 'Moorty Perepa',
         role: 'Member',
-        domain: 'Media',
+        domain: '3D Space',
         bio: "We're going on a trip, on our favourite rocket ship :3",
         photo_url: getCrewImagePath('Moorty.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-16',
+        name: 'Shreya Revankar',
+        role: 'Member',
+        domain: 'Media',
+        bio: "I'll do it but first I need to cry",
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-17',
+        name: 'Ragul Rajkumar',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: 'I’d rather fix the issue permanently than put a band aid on it.',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-18',
+        name: 'Maniish Rajendran',
+        role: 'Member',
+        domain: 'Programming',
+        bio: 'Fill in Later',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
       // New Recruits
       // Add new recruits here
       // Old Crew
-      // Add old crew here
+      {
+        id: 'oc-1',
+        name: 'Arun Murugappan I',
+        role: 'Club Head 25',
+        domain: 'Automotive',
+        bio: 'Machines n Circuits - A true obsession',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-2',
+        name: 'Shibu Rangarajan',
+        role: 'Legacy Core',
+        domain: 'Automotive',
+        bio: 'Idk man put off smn',
+        photo_url: getCrewImagePath('Shibu.jpg'),
+        created_at: new Date().toISOString(),
+      },
     ] as TeamMember[]
   }
 }
@@ -318,22 +379,14 @@ export async function submitHackathonRegistration(registration: {
   experience: string
   idea: string
   proposalPdf?: File | null
-  paymentScreenshot?: File | null
 }) {
   try {
     let proposalUrl: string | null = null
-    let paymentUrl: string | null = null
 
     // If files provided, upload them to 'hackathon' bucket. Ensure the bucket exists in Supabase storage.
     if (registration.proposalPdf) {
       const safeName = `${Date.now()}_${registration.teamName.replace(/\s+/g, '_')}_proposal.pdf`
       proposalUrl = await uploadFileToStorage('hackathon', safeName, registration.proposalPdf)
-    }
-
-    if (registration.paymentScreenshot) {
-      const ext = registration.paymentScreenshot.name.split('.').pop() || 'png'
-      const safeName = `${Date.now()}_${registration.teamName.replace(/\s+/g, '_')}_payment.${ext}`
-      paymentUrl = await uploadFileToStorage('hackathon', safeName, registration.paymentScreenshot)
     }
 
     const payload = {
@@ -346,7 +399,6 @@ export async function submitHackathonRegistration(registration: {
       experience: registration.experience,
       idea: registration.idea,
       proposal_pdf_url: proposalUrl,
-      payment_screenshot_url: paymentUrl,
     }
 
     const { data, error } = await supabase
