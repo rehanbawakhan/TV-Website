@@ -13,7 +13,7 @@ import IMG_Naveen from '@/lib/crewimg/Naveen Selvaraj.jpg'
 import IMG_Dhruv from '@/lib/crewimg/Dhruv Maheshwari.jpg'
 import IMG_Abhigyan from '@/lib/crewimg/Abhigyan.jpg'
 import IMG_Aarush from '@/lib/crewimg/Aarush khullar.jpg'
-import IMG_Yadunandan from '@/lib/crewimg/Yadunandan Reddy.JPG'
+import IMG_Yadunandan from '@/lib/crewimg/Yadunandan.jpg'
 import IMG_Bhuvigna from '@/lib/crewimg/Bhuvigna Reddy.jpg'
 import IMG_Miruthulaa from '@/lib/crewimg/Miruthulaa.jpg'
 import IMG_Hita from '@/lib/crewimg/Hita Shree.jpg'
@@ -51,7 +51,7 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Siddharth Shilin': IMG_Manish,
   'Abhigyan': IMG_Abhigyan,
   'Aarush Khullar': IMG_Aarush,
-  'Yadunandana Reddy M': '/images/Logo.png',
+  'Yadunandana Reddy M': IMG_Yadunandan,
   'Bhuvigna Reddy A T': IMG_Bhuvigna,
   'Miruthulaa E M': IMG_Miruthulaa,
   'Hitha Shree Suresh': IMG_Hita,
