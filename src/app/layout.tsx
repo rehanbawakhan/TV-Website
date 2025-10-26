@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import ClientRoot from '@/components/ClientRoot'
+import Footer from '@/components/Footer'
 
 export const dynamic = 'force-dynamic'
 
@@ -84,6 +85,7 @@ export default function RootLayout({
       <body suppressHydrationWarning className={inter.className}>
         <ClientRoot>
           {children}
+          <Footer />
         </ClientRoot>
       </body>
     </html>
