@@ -5,12 +5,11 @@ A modern, interactive website for Team Vegavath featuring 3D animations, cinemat
 ## Tech Stack
 
 - **Frontend**: Next.js 14+ with TypeScript
-- **3D Graphics**: React Three Fiber (R3F) + Drei
 - **Styling**: Tailwind CSS with custom orange-black gradient theme
 - **Animations**: Framer Motion
 - **Backend**: Supabase (PostgreSQL)
 - **Forms**: React Hook Form
-- **Deployment**: Vercel
+- **Deployment**: Netlify
 
 ## Project Structure
 
