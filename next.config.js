@@ -1,5 +1,16 @@
+/**
+ * Combined Next.js config: merges build ignores, images, env, rewrites, etc.
+ * This preserves all settings from both previous configs.
+ */
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {
