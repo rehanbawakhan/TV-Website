@@ -2,19 +2,9 @@
 
 import { Suspense } from 'react'
 import { motion } from 'framer-motion'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 
 // Load the heavy 3D scene only on the client to avoid SSR evaluation issues
-const Scene3D = dynamic(() => import('./Scene3D'), {
-  ssr: false,
-  // Provide a lightweight fallback while the client chunk loads
-  loading: () => (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="text-orange-500">Loading 3D Scene...</div>
-    </div>
-  ),
-})
 
 export default function HeroSection() {
   return (
@@ -23,13 +13,7 @@ export default function HeroSection() {
       <div className="absolute inset-0">
         {/* 3D scene in its own low z-index, non-interactive layer */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <Suspense fallback={
-            <div className="w-full h-full flex items-center justify-center">
-              <div className="text-orange-500">Loading 3D Scene...</div>
-            </div>
-          }>
-            <Scene3D />
-          </Suspense>
+          {/* 3D scene removed */}
         </div>
 
         {/* Soft dark overlay + subtle blur to make foreground readable */}
