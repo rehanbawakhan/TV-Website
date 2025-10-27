@@ -31,6 +31,7 @@ interface FormData {
 
 export default function HackathonRegister() {
   const [step, setStep] = useState(1)
+  const [formSchema, setFormSchema] = useState<any | null>(null)
   const [formData, setFormData] = useState<FormData>({
     teamName: '',
     teamLeader: '',
@@ -123,6 +124,23 @@ export default function HackathonRegister() {
 
   const [paymentPortalUrl, setPaymentPortalUrl] = useState<string | null>(null)
 
+  // fetch form schema if available to allow admin-driven forms
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/form-schema')
+        if (!res.ok) return
+        const json = await res.json()
+        if (!mounted) return
+        setFormSchema(json)
+      } catch (e) {
+        // ignore
+      }
+    })()
+    return () => { mounted = false }
+  }, [])
+
   useEffect(() => {
     let mounted = true
     ;(async () => {
@@ -197,47 +215,121 @@ export default function HackathonRegister() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Hackathon Registration Details</h2>
                 <div className="space-y-4">
-                  <input
-                    type="text"
-                    placeholder="Team Name"
-                    value={formData.teamName}
-                    onChange={(e) => setFormData({...formData, teamName: e.target.value})}
-                    className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                  />
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Team Leader Name"
-                      value={formData.teamLeader}
-                      onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
-                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                    />
-                    <select
-                      value={formData['campus'] || ''}
-                      onChange={(e) => setFormData({...formData, campus: e.target.value})}
-                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
-                    >
-                      <option value="">Select Campus (EC / RR)</option>
-                      <option value="EC">EC</option>
-                      <option value="RR">RR</option>
-                    </select>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                    />
-                    <input
-                      type="tel"
-                      placeholder="Phone Number"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                    />
-                  </div>
+                  {formSchema && Array.isArray(formSchema.fields) ? (
+                    (() => {
+                      const fields = formSchema.fields as any[]
+                      const membersIndex = fields.findIndex(f => f.type === 'members')
+                      const stepFields = membersIndex === -1 ? fields : fields.slice(0, membersIndex)
+                      return (
+                        <div className="space-y-4">
+                          {stepFields.map((field) => {
+                            const key = field.name
+                            const value = (formData as any)[key] || ''
+                            if (field.type === 'select') {
+                              return (
+                                <select
+                                  key={key}
+                                  value={value}
+                                  onChange={(e) => setFormData({...formData, [key]: e.target.value})}
+                                  className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                                >
+                                  <option value="">Select {field.label || key}</option>
+                                  {(field.options || []).map((opt: string) => (
+                                    <option key={opt} value={opt}>{opt}</option>
+                                  ))}
+                                </select>
+                              )
+                            }
+
+                            if (field.type === 'textarea') {
+                              return (
+                                <textarea
+                                  key={key}
+                                  placeholder={field.label || key}
+                                  value={value}
+                                  onChange={(e) => setFormData({...formData, [key]: e.target.value})}
+                                  className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                                />
+                              )
+                            }
+
+                            if (field.type === 'file') {
+                              return (
+                                <div key={key} className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
+                                  <label className="block text-sm text-gray-300 mb-2">{field.label || key}</label>
+                                  <input
+                                    type="file"
+                                    accept={field.accept || '*/*'}
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0] || null
+                                      setFormData({...formData, [key]: file})
+                                    }}
+                                    className="w-full text-sm text-gray-300"
+                                  />
+                                </div>
+                              )
+                            }
+
+                            // default to input types
+                            return (
+                              <input
+                                key={key}
+                                type={field.type === 'email' || field.type === 'tel' ? field.type : 'text'}
+                                placeholder={field.label || key}
+                                value={value}
+                                onChange={(e) => setFormData({...formData, [key]: e.target.value})}
+                                className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                              />
+                            )
+                          })}
+                        </div>
+                      )
+                    })()
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Team Name"
+                        value={formData.teamName}
+                        onChange={(e) => setFormData({...formData, teamName: e.target.value})}
+                        className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                      />
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Team Leader Name"
+                          value={formData.teamLeader}
+                          onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                        />
+                        <select
+                          value={formData['campus'] || ''}
+                          onChange={(e) => setFormData({...formData, campus: e.target.value})}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                        >
+                          <option value="">Select Campus (EC / RR)</option>
+                          <option value="EC">EC</option>
+                          <option value="RR">RR</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input
+                          type="email"
+                          placeholder="Email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Phone Number"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             )}
@@ -384,30 +476,82 @@ export default function HackathonRegister() {
                       </div>
                     ))}
                   </div>
-                  
-                  {/* Registration fee text removed per admin request */}
 
-                  {/* File uploads: Proposed Solution PDF and Payment Screenshot */}
-                  <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
-                      <label className="block text-sm text-gray-300 mb-2">Proposed Solution (PDF)</label>
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] || null
-                          setFormData({...formData, proposalPdf: file})
-                        }}
-                        className="w-full text-sm text-gray-300"
-                      />
-                      <div className="mt-2 text-xs text-gray-400">Upload a single PDF containing your proposed solution.</div>
+                  {/* If schema defines fields after members, render inputs for them here */}
+                  {formSchema && Array.isArray(formSchema.fields) ? (
+                    (() => {
+                      const fields = formSchema.fields as any[]
+                      const membersIndex = fields.findIndex(f => f.type === 'members')
+                      const tail = membersIndex === -1 ? [] : fields.slice(membersIndex + 1)
+                      if (!tail.length) return null
+                      return (
+                        <div className="mt-4 space-y-4">
+                          {tail.map((field) => {
+                            const key = field.name
+                            const value = (formData as any)[key] || ''
+                            if (field.type === 'textarea') {
+                              return (
+                                <div key={key}>
+                                  <label className="text-gray-400 block mb-2">{field.label || key}</label>
+                                  <textarea
+                                    value={value}
+                                    onChange={(e) => setFormData({...formData, [key]: e.target.value})}
+                                    className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white"
+                                  />
+                                </div>
+                              )
+                            }
+
+                            if (field.type === 'file') {
+                              return (
+                                <div key={key} className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
+                                  <label className="block text-sm text-gray-300 mb-2">{field.label || key}</label>
+                                  <input
+                                    type="file"
+                                    accept={field.accept || '*/*'}
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0] || null
+                                      setFormData({...formData, [key]: file})
+                                    }}
+                                    className="w-full text-sm text-gray-300"
+                                  />
+                                </div>
+                              )
+                            }
+
+                            // default input
+                            return (
+                              <input
+                                key={key}
+                                type={field.type === 'email' || field.type === 'tel' ? field.type : 'text'}
+                                placeholder={field.label || key}
+                                value={value}
+                                onChange={(e) => setFormData({...formData, [key]: e.target.value})}
+                                className="w-full p-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400"
+                              />
+                            )
+                          })}
+                        </div>
+                      )
+                    })()
+                  ) : (
+                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
+                        <label className="block text-sm text-gray-300 mb-2">Proposed Solution (PDF)</label>
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] || null
+                            setFormData({...formData, proposalPdf: file})
+                          }}
+                          className="w-full text-sm text-gray-300"
+                        />
+                        <div className="mt-2 text-xs text-gray-400">Upload a single PDF containing your proposed solution.</div>
+                      </div>
                     </div>
+                  )}
 
-                    {/* payment screenshot removed per request */}
-                  </div>
-
-                  {/* Simple diff panel showing uploaded file info */}
-                  {/* Uploaded files summary removed per request */}
                 </div>
               </div>
             )}

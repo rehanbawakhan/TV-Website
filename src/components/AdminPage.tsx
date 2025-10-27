@@ -118,6 +118,14 @@ export default function AdminPage() {
     }
   ])
 
+  // Form schema editor state
+  const [formEditorVisible, setFormEditorVisible] = useState(false)
+  const [schemaText, setSchemaText] = useState('')
+  const [schemaLoading, setSchemaLoading] = useState(false)
+  const [schemaError, setSchemaError] = useState('')
+  const [schemaObj, setSchemaObj] = useState<any | null>(null)
+  const [savingSchema, setSavingSchema] = useState(false)
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -170,6 +178,60 @@ export default function AdminPage() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString()
+  }
+
+  // Load schema when entering hackathon tab
+  useEffect(() => {
+    let mounted = true
+    if (activeTab === 'hackathon') {
+      ;(async () => {
+        setSchemaLoading(true)
+        setSchemaError('')
+        try {
+          const res = await fetch('/api/form-schema')
+          if (!res.ok) throw new Error('Failed to load schema')
+          const json = await res.json()
+          if (!mounted) return
+          setSchemaText(JSON.stringify(json, null, 2))
+          setSchemaObj(json)
+        } catch (e: any) {
+          if (!mounted) return
+          setSchemaError(e?.message || 'Error loading schema')
+        } finally {
+          if (!mounted) return
+          setSchemaLoading(false)
+        }
+      })()
+    }
+    return () => { mounted = false }
+  }, [activeTab])
+
+  const saveSchema = async () => {
+    setSchemaError('')
+    setSavingSchema(true)
+    try {
+      const toSave = schemaObj || (schemaText ? JSON.parse(schemaText) : null)
+      if (!toSave) throw new Error('No schema to save')
+      const res = await fetch('/api/form-schema', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(toSave)
+      })
+      if (!res.ok) throw new Error('Failed to save schema')
+      // give simple feedback
+      setFormEditorVisible(false)
+      // refetch and normalize
+      const r2 = await fetch('/api/form-schema')
+      if (r2.ok) {
+        const json = await r2.json()
+        setSchemaText(JSON.stringify(json, null, 2))
+        setSchemaObj(json)
+      }
+    } catch (e: any) {
+      setSchemaError(e?.message || 'Failed to save schema')
+    } finally {
+      setSavingSchema(false)
+    }
   }
 
   if (!isLoggedIn) {
@@ -437,8 +499,179 @@ export default function AdminPage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-white">Ignition 1.0 Registrations</h2>
-                
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold text-white">Ignition 1.0 Registrations</h2>
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => setFormEditorVisible(prev => !prev)}
+                      className="px-3 py-2 bg-gray-800/40 hover:bg-gray-800/60 text-sm rounded-lg"
+                    >
+                      {formEditorVisible ? 'Close Form Editor' : 'Edit Registration Form'}
+                    </button>
+                    <a href="/ignition" target="_blank" rel="noreferrer" className="px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm">
+                      Open Public Form
+                    </a>
+                  </div>
+                </div>
+
+                {formEditorVisible && (
+                  <div className="bg-gray-900/50 border border-gray-700/50 rounded-xl p-6">
+                    <h3 className="text-lg font-semibold text-white mb-3">Form Builder</h3>
+                    {schemaLoading ? (
+                      <div className="text-gray-400">Loading schema...</div>
+                    ) : schemaError ? (
+                      <div className="text-red-400">{schemaError}</div>
+                    ) : (
+                      <div>
+                        {/* Builder list */}
+                        <div className="space-y-3">
+                          {(schemaObj?.fields || []).map((field: any, idx: number) => (
+                            <div key={idx} className="bg-gray-800 p-3 rounded-lg border border-gray-700">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center space-x-3">
+                                  <div className="text-sm text-gray-300 font-medium">Field {idx + 1}</div>
+                                  <div className="text-xs text-gray-400">({field.type})</div>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <button
+                                    onClick={() => {
+                                      if (idx === 0) return
+                                      const f = [...(schemaObj.fields || [])]
+                                      const tmp = f[idx - 1]
+                                      f[idx - 1] = f[idx]
+                                      f[idx] = tmp
+                                      setSchemaObj({ ...schemaObj, fields: f })
+                                    }}
+                                    className="px-2 py-1 bg-gray-700 rounded text-sm"
+                                  >↑</button>
+                                  <button
+                                    onClick={() => {
+                                      if (idx === (schemaObj.fields || []).length - 1) return
+                                      const f = [...(schemaObj.fields || [])]
+                                      const tmp = f[idx + 1]
+                                      f[idx + 1] = f[idx]
+                                      f[idx] = tmp
+                                      setSchemaObj({ ...schemaObj, fields: f })
+                                    }}
+                                    className="px-2 py-1 bg-gray-700 rounded text-sm"
+                                  >↓</button>
+                                  <button
+                                    onClick={() => {
+                                      const f = (schemaObj.fields || []).filter((_: any, i: number) => i !== idx)
+                                      setSchemaObj({ ...schemaObj, fields: f })
+                                    }}
+                                    className="px-2 py-1 bg-red-600 rounded text-sm text-white"
+                                  >Remove</button>
+                                </div>
+                              </div>
+
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <input
+                                  value={field.label || ''}
+                                  onChange={(e) => {
+                                    const f = [...(schemaObj.fields || [])]
+                                    f[idx] = { ...f[idx], label: e.target.value }
+                                    setSchemaObj({ ...schemaObj, fields: f })
+                                  }}
+                                  className="p-2 bg-gray-900 border border-gray-700 rounded text-white"
+                                  placeholder="Label"
+                                />
+                                <input
+                                  value={field.name || ''}
+                                  onChange={(e) => {
+                                    const f = [...(schemaObj.fields || [])]
+                                    f[idx] = { ...f[idx], name: e.target.value }
+                                    setSchemaObj({ ...schemaObj, fields: f })
+                                  }}
+                                  className="p-2 bg-gray-900 border border-gray-700 rounded text-white"
+                                  placeholder="Name (key)"
+                                />
+                                <select
+                                  value={field.type || 'text'}
+                                  onChange={(e) => {
+                                    const f = [...(schemaObj.fields || [])]
+                                    f[idx] = { ...f[idx], type: e.target.value }
+                                    setSchemaObj({ ...schemaObj, fields: f })
+                                  }}
+                                  className="p-2 bg-gray-900 border border-gray-700 rounded text-white"
+                                >
+                                  <option value="text">Text</option>
+                                  <option value="email">Email</option>
+                                  <option value="tel">Phone</option>
+                                  <option value="textarea">Textarea</option>
+                                  <option value="select">Select</option>
+                                  <option value="members">Members (special)</option>
+                                  <option value="file">File</option>
+                                </select>
+                              </div>
+
+                              <div className="flex items-center space-x-3 mt-3">
+                                <label className="text-sm text-gray-300 inline-flex items-center">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!field.required}
+                                    onChange={(e) => {
+                                      const f = [...(schemaObj.fields || [])]
+                                      f[idx] = { ...f[idx], required: e.target.checked }
+                                      setSchemaObj({ ...schemaObj, fields: f })
+                                    }}
+                                    className="mr-2"
+                                  />
+                                  Required
+                                </label>
+                                {field.type === 'select' && (
+                                  <input
+                                    value={(field.options || []).join(',')}
+                                    onChange={(e) => {
+                                      const opts = e.target.value.split(',').map((s) => s.trim()).filter(Boolean)
+                                      const f = [...(schemaObj.fields || [])]
+                                      f[idx] = { ...f[idx], options: opts }
+                                      setSchemaObj({ ...schemaObj, fields: f })
+                                    }}
+                                    className="p-2 bg-gray-900 border border-gray-700 rounded text-white"
+                                    placeholder="Options (comma separated)"
+                                  />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-4 flex items-center space-x-3">
+                          <button
+                            onClick={() => {
+                              const f = schemaObj?.fields ? [...schemaObj.fields] : []
+                              const idx = f.length + 1
+                              f.push({ name: `field_${idx}`, label: 'New Field', type: 'text', required: false })
+                              setSchemaObj({ ...(schemaObj || { title: 'Custom Form' }), fields: f })
+                            }}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+                          >
+                            Add Field
+                          </button>
+
+                          <button
+                            onClick={async () => await saveSchema()}
+                            disabled={savingSchema}
+                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                          >
+                            {savingSchema ? 'Saving…' : 'Save Schema'}
+                          </button>
+
+                          <button
+                            onClick={() => { setFormEditorVisible(false); /* discard changes visually */ }}
+                            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+
+                        {schemaError && <div className="mt-2 text-red-400">{schemaError}</div>}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   {hackathonSubmissions.map((submission) => (
                     <motion.div

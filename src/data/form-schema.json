@@ -1,0 +1,64 @@
+{
+  "title": "Ignition 1.0 Registration",
+  "fields": [
+    {
+      "name": "teamName",
+      "label": "Team Name",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "teamLeader",
+      "label": "Team Leader",
+      "type": "text",
+      "required": true
+    },
+    {
+      "name": "email",
+      "label": "Email",
+      "type": "email",
+      "required": true
+    },
+    {
+      "name": "phone",
+      "label": "Phone",
+      "type": "tel",
+      "required": true
+    },
+    {
+      "name": "campus",
+      "label": "Campus",
+      "type": "select",
+      "options": [
+        "EC",
+        "RR"
+      ],
+      "required": false
+    },
+    {
+      "name": "members",
+      "label": "Members",
+      "type": "members",
+      "required": true
+    },
+    {
+      "name": "experience",
+      "label": "Experience",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "idea",
+      "label": "Idea",
+      "type": "textarea",
+      "required": true
+    },
+    {
+      "name": "proposalPdf",
+      "label": "Proposed Solution (PDF)",
+      "type": "file",
+      "accept": "application/pdf",
+      "required": false
+    }
+  ]
+}

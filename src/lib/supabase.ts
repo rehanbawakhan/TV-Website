@@ -267,6 +267,24 @@ export async function getTeamMembers() {
         photo_url: getCrewImagePath('Manish.png'),
         created_at: new Date().toISOString(),
       },
+      {
+        id: 'crew-19',
+        name: 'Ankit Bembalgi',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: '"The harder i push, The more I find within myself" -Ayrton Senna',
+        photo_url: getCrewImagePath('Ankit Bembalgi.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-20',
+        name: 'Vinay Dasari',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: 'If you told me something, I probably forgot it',
+        photo_url: getCrewImagePath('Vinay Dasari.jpg'),
+        created_at: new Date().toISOString(),
+      },
       // New Recruits
       // Add new recruits here
       // Old Crew
@@ -287,6 +305,24 @@ export async function getTeamMembers() {
         domain: 'Automotive',
         bio: 'Idk man put off smn',
         photo_url: getCrewImagePath('Shibu.jpg'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-3',
+        name: 'Swetha Ranganathan',
+        role: 'Club Head 23',
+        domain: 'Automotive',
+        bio: 'Never, ever, forget to have fun. #Lifeatfullthrottle',
+        photo_url: getCrewImagePath('Swetha.png'),
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-4',
+        name: 'Ram Prakhyath',
+        role: 'Old Crew',
+        domain: 'Automotive',
+        bio: 'Grazie Ragazzi',
+        photo_url: getCrewImagePath('Ram Prakhyath.png'),
         created_at: new Date().toISOString(),
       },
 // Crew image tile size recommendation: 1:1 aspect ratio, e.g. 600x600px or 800x800px for best fit in the UI.

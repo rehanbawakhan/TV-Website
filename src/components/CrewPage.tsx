@@ -32,6 +32,10 @@ import IMG_Keshav from '@/lib/crewimg/Keshav.jpg'
 import IMG_Sharanya from '@/lib/crewimg/Sharanya.jpg'
 import IMG_Manish from '@/lib/crewimg/Manish.png'
 import IMG_Karan from '@/lib/crewimg/Karan.jpg'
+import IMG_Ankit from '@/lib/crewimg/Ankit Bembalgi.jpg'
+import IMG_Vinay from '@/lib/crewimg/Vinay Dasari.jpg'
+import IMG_Swetha from '@/lib/crewimg/Swetha.png'
+import IMG_Ram from '@/lib/crewimg/Ram Prakhyath.png'
 
 const domainColors = {
   Automotive: 'from-orange-500 to-red-600',
@@ -73,6 +77,10 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Keshav': IMG_Keshav,
   'Sharanya N': IMG_Sharanya,
   'Sharanya': IMG_Sharanya,
+  'Ankit Bembalgi': IMG_Ankit,
+  'Vinay Dasari': IMG_Vinay,
+  'Swetha Ranganathan': IMG_Swetha,
+  'Ram Prakhyath': IMG_Ram,
 }
 
 // Map normalized filenames (lowercased) to imported assets
@@ -103,6 +111,10 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'ankush.jpg': IMG_Ankush,
   'sid.png': IMG_Sid,
   'manish.png': IMG_Manish,
+  'ankit bembalgi.jpg': IMG_Ankit,
+  'vinay dasari.jpg': IMG_Vinay,
+  'swetha.png': IMG_Swetha,
+  'ram prakhyath.png': IMG_Ram,
 }
 
 function resolveMemberImage(member: TeamMember): StaticImageData | string {

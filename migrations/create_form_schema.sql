@@ -1,0 +1,22 @@
+-- Migration: create form_schema table
+-- Run this in psql or Supabase SQL editor
+-- Migration: create form_schema table (PostgreSQL / Supabase)
+-- This file contains the PostgreSQL DDL to create the `form_schema` table.
+-- Some editors/linters that parse SQL using a different dialect may show
+-- syntax errors for PostgreSQL-specific types and clauses (e.g. jsonb,
+-- timestamptz, bigserial). If you see such errors in your environment,
+-- run the SQL directly in Supabase's SQL editor or use the provided Node
+-- script `scripts/create_form_schema.js` which will create and seed the
+-- table using your DATABASE_URL.
+
+-- SQL (PostgreSQL) - run in psql or Supabase SQL editor:
+--
+-- CREATE TABLE public.form_schema (
+--   id bigserial PRIMARY KEY,
+--   schema jsonb NOT NULL,
+--   created_at timestamptz NOT NULL DEFAULT now()
+-- );
+--
+-- -- Optional: create an index on created_at if you will query by it
+-- CREATE INDEX idx_form_schema_created_at ON public.form_schema (created_at);
+
