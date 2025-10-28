@@ -49,34 +49,10 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Mock data - In a real app, this would come from a database
-  const [hackathonSubmissions] = useState<HackathonSubmission[]>([
-    {
-      id: '1',
-      teamName: 'Racing Legends',
-      teamLeader: 'John Doe',
-      email: 'john@example.com',
-      phone: '+91 9876543210',
-      members: [
-        { name: 'John Doe', srn: 'PES1UG21CS001', email: 'john@example.com', phone: '+91 9876543210', semester: '7', section: 'A' },
-        { name: 'Jane Smith', srn: 'PES1UG21CS002', email: 'jane@example.com', phone: '+91 9876543211', semester: '7', section: 'A' },
-      ],
-      submittedAt: '2024-10-12T10:30:00Z'
-    },
-    {
-      id: '2',
-      teamName: 'Tech Innovators',
-      teamLeader: 'Alice Johnson',
-      email: 'alice@example.com',
-      phone: '+91 9876543220',
-      members: [
-        { name: 'Alice Johnson', srn: 'PES1UG21CS003', email: 'alice@example.com', phone: '+91 9876543220', semester: '6', section: 'B' },
-        { name: 'Bob Wilson', srn: 'PES1UG21CS004', email: 'bob@example.com', phone: '+91 9876543221', semester: '6', section: 'B' },
-        { name: 'Carol Davis', srn: 'PES1UG21CS005', email: 'carol@example.com', phone: '+91 9876543222', semester: '6', section: 'B' },
-      ],
-      submittedAt: '2024-10-12T14:15:00Z'
-    }
-  ])
+  // Real submissions come from the backend. Start empty and fetch when logged in.
+  const [hackathonSubmissions, setHackathonSubmissions] = useState<HackathonSubmission[]>([])
+  const [submissionsLoading, setSubmissionsLoading] = useState(false)
+  const [downloadingCsv, setDownloadingCsv] = useState(false)
 
   const [joinRequests] = useState<JoinRequest[]>([
     {
@@ -108,14 +84,6 @@ export default function AdminPage() {
       createdAt: '2024-10-10T12:00:00Z',
       active: true
     },
-    {
-      id: '2',
-      title: 'Workshop on Autonomous Vehicles',
-      content: 'Learn about the latest developments in autonomous vehicle technology this Saturday.',
-      type: 'info',
-      createdAt: '2024-10-09T15:30:00Z',
-      active: true
-    }
   ])
 
   // Form schema editor state
@@ -130,17 +98,33 @@ export default function AdminPage() {
     e.preventDefault()
     setIsLoading(true)
     setLoginError('')
+    try {
+      // Easter-egg: if user enters the test credentials Admin / Password, redirect to the egg page
+      // NOTE: per security/safety we keep the egg playful and dismissible (no uncloseable flashing).
+      if (username === 'Admin' && password === 'Password') {
+        // small delay to allow button animation
+        window.location.href = '/admin/egg'
+        return
+      }
 
-    // Simulate login delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    if (username === 'Admin' && password === 'ProjectOmega@420') {
-      setIsLoggedIn(true)
-      setLoginError('')
-    } else {
-      setLoginError('Invalid credentials. Access denied.')
+      // Call server-side login endpoint which sets an HttpOnly cookie on success
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+      const json = await res.json()
+      if (json.success) {
+        setIsLoggedIn(true)
+        setLoginError('')
+      } else {
+        setLoginError(json.error || 'Invalid credentials. Access denied.')
+      }
+    } catch (err: any) {
+      setLoginError(err?.message || 'Login failed')
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
   const handleLogout = () => {
@@ -205,6 +189,42 @@ export default function AdminPage() {
     }
     return () => { mounted = false }
   }, [activeTab])
+
+  // Fetch hackathon registrations from the server when viewing the hackathon tab and logged in
+  useEffect(() => {
+    let mounted = true
+    if (activeTab === 'hackathon' && isLoggedIn) {
+      ;(async () => {
+        setSubmissionsLoading(true)
+        try {
+          const res = await fetch('/api/admin/registrations')
+          if (!res.ok) throw new Error('Failed to load registrations')
+          const json = await res.json()
+          if (!mounted) return
+          if (json.success && Array.isArray(json.data)) {
+            // map backend shape to HackathonSubmission
+            const mapped: HackathonSubmission[] = json.data.map((r: any, idx: number) => ({
+              id: r.id || String(idx),
+              teamName: r.team_name || r.teamName || 'Team',
+              teamLeader: r.leader_name || r.leaderName || '',
+              email: r.leader_email || r.leaderEmail || '',
+              phone: r.leader_phone || r.leaderPhone || '',
+              members: Array.isArray(r.members) ? r.members : (r.members ? JSON.parse(r.members) : []),
+              submittedAt: r.created_at || r.createdAt || ''
+            }))
+            setHackathonSubmissions(mapped)
+          }
+        } catch (e) {
+          // keep existing state on error (still show mock if any)
+          console.error('Failed to fetch registrations', e)
+        } finally {
+          if (!mounted) return
+          setSubmissionsLoading(false)
+        }
+      })()
+    }
+    return () => { mounted = false }
+  }, [activeTab, isLoggedIn])
 
   const saveSchema = async () => {
     setSchemaError('')
@@ -507,6 +527,32 @@ export default function AdminPage() {
                       className="px-3 py-2 bg-gray-800/40 hover:bg-gray-800/60 text-sm rounded-lg"
                     >
                       {formEditorVisible ? 'Close Form Editor' : 'Edit Registration Form'}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          setDownloadingCsv(true)
+                          const res = await fetch('/api/admin/registrations?export=csv')
+                          if (!res.ok) throw new Error('Failed to download CSV')
+                          const blob = await res.blob()
+                          const url = URL.createObjectURL(blob)
+                          const a = document.createElement('a')
+                          a.href = url
+                          a.download = `hackathon_registrations_${Date.now()}.csv`
+                          document.body.appendChild(a)
+                          a.click()
+                          a.remove()
+                          URL.revokeObjectURL(url)
+                        } catch (e) {
+                          console.error('CSV download failed', e)
+                        } finally {
+                          setDownloadingCsv(false)
+                        }
+                      }}
+                      disabled={downloadingCsv}
+                      className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm"
+                    >
+                      {downloadingCsv ? 'Downloading…' : 'Download CSV'}
                     </button>
                     <a href="/ignition" target="_blank" rel="noreferrer" className="px-3 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm">
                       Open Public Form

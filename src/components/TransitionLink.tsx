@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
 import { useState } from 'react'
 
 interface TransitionLinkProps {
@@ -21,39 +20,30 @@ export default function TransitionLink({
   const router = useRouter()
   const [isTransitioning, setIsTransitioning] = useState(false)
 
-  const handleClick = async (e: React.MouseEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    
+
     if (onClick) onClick()
-    
+
+    // start transition state for visual feedback, but navigate immediately
     setIsTransitioning(true)
-    
-    // Small delay for visual feedback
-    await new Promise(resolve => setTimeout(resolve, 150))
-    
     router.push(href)
   }
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`inline-block ${className}`}
-    >
+    <div className={`inline-block ${className}`}>
       <Link
         href={href}
         onClick={handleClick}
-        className={`block relative overflow-hidden ${
-          isTransitioning ? 'pointer-events-none' : ''
-        }`}
+        className={`block relative overflow-hidden ${isTransitioning ? 'pointer-events-none' : ''}`}
       >
-        <motion.div
-          animate={isTransitioning ? { x: '100%' } : { x: '-100%' }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-orange/20 to-transparent z-10"
+        {/* simple CSS-based overlay for subtle feedback (non-blocking) */}
+        <div
+          aria-hidden
+          className={`absolute inset-0 z-10 pointer-events-none transition-transform duration-300 ease-in-out ${isTransitioning ? 'translate-x-full' : '-translate-x-full'} bg-gradient-to-r from-transparent via-primary-orange/20 to-transparent`}
         />
         {children}
       </Link>
-    </motion.div>
+    </div>
   )
 }

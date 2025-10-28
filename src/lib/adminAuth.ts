@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || ''
+// Default admin password fallback for local/dev. IMPORTANT: for production set ADMIN_PASSWORD in env.
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'ProjectOmega@420'
 const COOKIE_SECRET = process.env.ADMIN_COOKIE_SECRET || 'dev_secret_change_me'
 const COOKIE_NAME = 'admin_auth'
 
