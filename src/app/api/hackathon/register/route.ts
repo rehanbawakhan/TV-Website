@@ -139,10 +139,10 @@ export async function POST(req: Request) {
         if (code === 'PGRST205') {
           console.error('Table missing (PGRST205):', error)
           return NextResponse.json({
-            error: 'DB insert failed - table missing',
-            details: error,
-            action: 'Run the migration: npm run db:create-hackathon-table with DATABASE_URL set, or run migrations/create_hackathon_registrations.sql in your DB.'
-          }, { status: 500 })
+              error: 'DB insert failed - table missing',
+              details: error,
+              action: 'The database table "hackathon_registrations" is missing. Create it in your database (for Supabase: run the CREATE TABLE SQL in the SQL editor) or restore the migration file from the repository history and apply it.'
+            }, { status: 500 })
         }
 
         return NextResponse.json({ error: 'DB insert failed', details: error }, { status: 500 })
