@@ -10,7 +10,7 @@ export const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
 
 export async function listHackathonRegistrations() {
   const { data, error } = await supabaseAdmin
-    .from('hackathon_registrations')
+    .from('hackathon')
     .select('*')
     .order('created_at', { ascending: false })
 
@@ -20,7 +20,7 @@ export async function listHackathonRegistrations() {
 
 export async function getHackathonRegistrationById(id: string) {
   const { data, error } = await supabaseAdmin
-    .from('hackathon_registrations')
+    .from('hackathon')
     .select('*')
     .eq('id', id)
     .single()

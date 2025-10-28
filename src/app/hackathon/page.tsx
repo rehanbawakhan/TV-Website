@@ -1,7 +1,8 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 import Navigation from '../../components/Navigation'
 import toast from 'react-hot-toast'
 
@@ -28,6 +29,7 @@ interface FormData {
 }
 
 export default function HackathonRegister() {
+  const router = useRouter()
   const [step, setStep] = useState(1)
   const [formSchema, setFormSchema] = useState<any | null>(null)
   const [formData, setFormData] = useState<FormData>({
@@ -107,11 +109,28 @@ export default function HackathonRegister() {
         body: JSON.stringify(payload),
       })
 
-      const result = await res.json()
-      if (!res.ok) throw result
+      let resultText = ''
+      try {
+        resultText = await res.text()
+      } catch (e) {
+        resultText = ''
+      }
 
+      if (!res.ok) {
+        // Try to parse JSON if possible for richer info
+        let parsed: any = null
+        try { parsed = JSON.parse(resultText) } catch (e) { parsed = null }
+        console.error('Registration API error', { status: res.status, body: parsed ?? resultText })
+        toast.error(
+          parsed?.error || parsed?.message || `Submission failed (${res.status})`
+        )
+        return
+      }
+
+      // success
       toast.success('Registration submitted successfully!')
-      setStep(4)
+      // Redirect to a dedicated submitted page that shows animation then forwards to guidelines
+      router.push('/hackathon/submitted')
     } catch (error) {
       console.error('Error submitting registration:', error)
       toast.error('Failed to submit registration. Please try again.')

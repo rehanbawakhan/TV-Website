@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+// keep this route lightweight and avoid bundling native DB drivers here.
+// Migration should be run separately using the provided script `npm run db:create-hackathon-table`.
 
 // Server-side route: accepts JSON payload with fields and optional base64 file data.
 export async function POST(req: Request) {
@@ -13,8 +15,6 @@ export async function POST(req: Request) {
       phone,
       campus,
       members,
-      experience,
-      idea,
       proposalPdf,
     } = body
 
@@ -62,6 +62,7 @@ export async function POST(req: Request) {
 
     // Upload files if provided
     let proposalUrl: string | null = null
+    let detailsUrl: string | null = null
     let paymentUrl: string | null = null
     try {
       if (proposalPdf) {
@@ -81,9 +82,47 @@ export async function POST(req: Request) {
       leader_phone: phone,
       campus: campus || null,
       members: members || [],
-      experience: experience || null,
-      idea: idea || null,
       proposal_pdf_url: proposalUrl,
+    }
+
+    // Also upload a JSON file with the registration details to the same 'hackathon' bucket
+    try {
+      const detailsObj = {
+        teamName,
+        teamLeader,
+        email,
+        phone,
+        campus: campus || null,
+        members: members || [],
+        proposal_pdf_url: proposalUrl,
+        created_at: new Date().toISOString(),
+      }
+
+      const detailsBuffer = Buffer.from(JSON.stringify(detailsObj, null, 2), 'utf8')
+      const safeDetailsName = `${teamName.replace(/\s+/g, '_')}_details_${Date.now()}.json`
+
+      // Ensure bucket exists (create if missing) — uploadBase64 already attempted create earlier but do it again defensively
+      try {
+        // @ts-ignore
+        const { error: createErr } = await supabaseAdmin.storage.createBucket('hackathon', { public: true })
+        if (createErr) {
+          // ignore
+        }
+      } catch (e) {
+        // ignore
+      }
+
+      const { error: detailsUploadError } = await supabaseAdmin.storage.from('hackathon').upload(safeDetailsName, detailsBuffer, { upsert: true })
+      if (!detailsUploadError) {
+        const publicResult = supabaseAdmin.storage.from('hackathon').getPublicUrl(safeDetailsName)
+        detailsUrl = (publicResult as any)?.data?.publicUrl || null
+        // attach to payload so DB has reference
+        payload.details_url = detailsUrl
+      } else {
+        console.warn('Failed to upload registration details JSON (continuing):', detailsUploadError)
+      }
+    } catch (e) {
+      console.error('Details upload error (ignored):', e)
     }
 
     try {
@@ -94,6 +133,18 @@ export async function POST(req: Request) {
 
       if (error) {
         console.error('Insert error details:', error)
+
+        // If table is missing (PGRST205), return a helpful error instructing the operator to run the migration.
+        const code = (error as any)?.code
+        if (code === 'PGRST205') {
+          console.error('Table missing (PGRST205):', error)
+          return NextResponse.json({
+            error: 'DB insert failed - table missing',
+            details: error,
+            action: 'Run the migration: npm run db:create-hackathon-table with DATABASE_URL set, or run migrations/create_hackathon_registrations.sql in your DB.'
+          }, { status: 500 })
+        }
+
         return NextResponse.json({ error: 'DB insert failed', details: error }, { status: 500 })
       }
 
