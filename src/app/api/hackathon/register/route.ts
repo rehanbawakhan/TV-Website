@@ -127,7 +127,7 @@ export async function POST(req: Request) {
 
     try {
       const { data, error } = await supabaseAdmin
-        .from('hackathon_registrations')
+        .from('hackathon')
         .insert([payload])
         .select()
 

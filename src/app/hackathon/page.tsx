@@ -33,6 +33,7 @@ export default function HackathonRegister() {
   const [step, setStep] = useState(1)
   const [formSchema, setFormSchema] = useState<any | null>(null)
   const [proposalError, setProposalError] = useState<string | null>(null)
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState<FormData>({
     teamName: '',
     teamLeader: '',
@@ -79,71 +80,67 @@ export default function HackathonRegister() {
   }
 
   const handleSubmit = async () => {
-    // Handle form submission: upload files and save registration server-side via Supabase
-    try {
-      const filteredMembers = formData.members.filter((m) => m.name && m.name.trim())
-
-      // Helper: convert file to data URL
-      const fileToDataUrl = (file: File | null | undefined) => new Promise<string | null>((resolve) => {
-        if (!file) return resolve(null)
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = () => resolve(null)
-        reader.readAsDataURL(file)
-      })
-
-      const proposalData = await fileToDataUrl((formData as any).proposalPdf)
-      // If there's no proposal PDF, show an inline error and don't proceed
-      if (!proposalData) {
-        setProposalError('Please upload a proposal PDF to submit your registration.')
-        // Focus/scroll could be added here if desired
-        return
-      }
-      const payload = {
-        teamName: formData.teamName,
-        teamLeader: formData.teamLeader,
-        email: formData.email,
-        phone: formData.phone,
-        campus: formData.campus,
-        members: filteredMembers,
-        // experience & idea fields removed per request
-        proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
-      }
-
-      const res = await fetch('/api/hackathon/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-
-      let resultText = ''
-      try {
-        resultText = await res.text()
-      } catch (e) {
-        resultText = ''
-      }
-
-      if (!res.ok) {
-        // The backend may be reporting non-fatal errors (e.g., DB table missing) while
-        // uploads to storage have succeeded. We still want to treat the flow as a
-        // success for the user if the proposal was uploaded (proposalData exists).
-        let parsed: any = null
-        try { parsed = JSON.parse(resultText) } catch (e) { parsed = null }
-        console.error('Registration API returned non-OK status', { status: res.status, body: parsed ?? resultText })
-        // Show a friendly success toast and redirect despite server-side non-OK so
-        // users are not blocked when their proposal file was uploaded.
-        toast.success('Registration submitted — your proposal was uploaded. Thank you!')
-        router.push('/hackathon/submitted')
-        return
-      }
-
-      // success (200/201)
-      toast.success('Registration submitted successfully!')
-      router.push('/hackathon/submitted')
-    } catch (error) {
-      console.error('Error submitting registration:', error)
-      toast.error('Failed to submit registration. Please try again.')
+    // Prevent spamming the submit button and redirect immediately when a proposal is present.
+    if (submitting) return
+    // If there's no selected file, show inline error and do not proceed.
+    if (!formData.proposalPdf) {
+      setProposalError('Please upload a proposal PDF to submit your registration.')
+      return
     }
+
+    setProposalError(null)
+    setSubmitting(true)
+
+    // Launch background submission (do not await) so the user is redirected instantly.
+    ;(async () => {
+      try {
+        const filteredMembers = formData.members.filter((m) => m.name && m.name.trim())
+
+        // Helper: convert file to data URL
+        const fileToDataUrl = (file: File | null | undefined) => new Promise<string | null>((resolve) => {
+          if (!file) return resolve(null)
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = () => resolve(null)
+          reader.readAsDataURL(file)
+        })
+
+        const proposalData = await fileToDataUrl((formData as any).proposalPdf)
+        const payload = {
+          teamName: formData.teamName,
+          teamLeader: formData.teamLeader,
+          email: formData.email,
+          phone: formData.phone,
+          campus: formData.campus,
+          members: filteredMembers,
+          proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
+        }
+
+        const res = await fetch('/api/hackathon/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+
+        if (!res.ok) {
+          let resultText = ''
+          try { resultText = await res.text() } catch (e) { resultText = '' }
+          let parsed: any = null
+          try { parsed = JSON.parse(resultText) } catch (e) { parsed = null }
+          console.error('Background registration error', { status: res.status, body: parsed ?? resultText })
+        }
+      } catch (error) {
+        console.error('Background submission failed:', error)
+      } finally {
+        // Keep submitting true long enough to avoid accidental re-clicks during navigation.
+        // It's safe to clear it after a short delay in case the user navigates back.
+        setTimeout(() => setSubmitting(false), 3000)
+      }
+    })()
+
+    // Immediately redirect the user to the submitted page to avoid double submissions.
+    toast.success('Registration submitted — uploading in background. Redirecting...')
+    router.push('/hackathon/submitted')
   }
 
   // fetch form schema if available to allow admin-driven forms
@@ -632,10 +629,10 @@ export default function HackathonRegister() {
                   
                   <button
                     onClick={step === 3 ? handleSubmit : handleNext}
-                    disabled={!isStepValid()}
+                    disabled={!isStepValid() || (step === 3 && submitting)}
                     className="px-6 py-3 bg-gradient-orange text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                   >
-                    {step === 3 ? 'Submit' : 'Next'}
+                    {step === 3 ? (submitting ? 'Submitting…' : 'Submit') : 'Next'}
                   </button>
                 </div>
               </div>

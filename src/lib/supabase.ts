@@ -440,7 +440,7 @@ export async function submitHackathonRegistration(registration: {
     }
 
     const { data, error } = await supabase
-      .from('hackathon_registrations')
+      .from('hackathon')
       .insert([payload])
       .select()
 
