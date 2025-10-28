@@ -17,20 +17,20 @@ export default function HeroSection() {
       document.head.appendChild(s)
     }
 
-    const container = document.getElementById('gokart-model')
-    if (container) {
-      // inject the model-viewer tag; model file should be placed at public/models/gokart.glb
-      container.innerHTML = `
+    const bg = document.getElementById('bg-gokart')
+    if (bg) {
+      // inject a full-bleed model-viewer as a subtle background element
+      // expected model path: public/models/gokart.glb
+      // Note: auto-rotate removed so the parent container's rotation controls the visual spin
+      bg.innerHTML = `
         <model-viewer
           src="/models/gokart.glb"
           alt="Gokart 3D Model"
-          auto-rotate
           camera-controls
+          touch-action="pan-y"
           exposure="1"
-          shadow-intensity="1"
-          ar
-          ar-modes="webxr scene-viewer quick-look"
-          style="width:100%;height:100%;"
+          shadow-intensity="0.8"
+          style="width:140%; height:140%; opacity:0.06; transform: translate3d(-20%, -10%, 0); object-fit:cover;"
         ></model-viewer>
       `
     }
@@ -38,12 +38,14 @@ export default function HeroSection() {
 
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-black">
-      {/* Large background wordmark */}
-      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-        <h2 className="font-extrabold text-white/6 uppercase tracking-widest select-none" style={{fontSize: '20rem', lineHeight: 0.8}}>
-          VEGAVATH
-        </h2>
-      </div>
+      {/* Background revolving 3D gokart */}
+      <motion.div
+        id="bg-gokart"
+        className="absolute inset-0 z-0 pointer-events-none overflow-hidden"
+        style={{ transformOrigin: '50% 50%' }}
+        animate={{ rotate: 360 }}
+        transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
+      />
 
       {/* 3D Background + overlays */}
       <div className="absolute inset-0">
@@ -102,25 +104,17 @@ export default function HeroSection() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 1.2 }}
           >
-            Where{' '}
-            <motion.span 
+            <span className="text-white font-semibold">Life At</span>
+            {' '}
+            <motion.span
               className="text-primary-orange font-semibold"
-              whileHover={{ 
-                textShadow: '0 0 15px rgba(255, 107, 53, 0.8)',
-                scale: 1.02
+              whileHover={{
+                scale: 1.06,
+                textShadow: '0 0 14px rgba(249,115,22,0.95)'
               }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
             >
-              Innovation
-            </motion.span>
-            {' '}Meets{' '}
-            <motion.span 
-              className="text-primary-orange font-semibold"
-              whileHover={{ 
-                textShadow: '0 0 15px rgba(255, 107, 53, 0.8)',
-                scale: 1.02
-              }}
-            >
-              Engineering Excellence
+              Full Throttle
             </motion.span>
           </motion.p>
 
@@ -237,13 +231,7 @@ export default function HeroSection() {
         />
       </div>
 
-      {/* 3D Gokart Model (frosted glass card) */}
-      <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-30">
-        <div className="w-96 h-64 bg-white/6 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex items-center justify-center shadow-lg">
-          {/* model-viewer will be injected here on the client */}
-          <div id="gokart-model" className="w-full h-full" />
-        </div>
-      </div>
+      {/* (side card removed - gokart is now the background element) */}
       
       {/* Floating particles */}
       {[...Array(12)].map((_, i) => (

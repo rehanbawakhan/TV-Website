@@ -72,22 +72,22 @@ export default function Navigation() {
                   className="relative text-white hover:text-primary-orange transition-colors duration-300 group modern-body"
                 >
                   <motion.span
-                    className="relative z-10 font-medium px-3 py-2 block"
-                    whileHover={{ 
-                      scale: 1.1,
-                      textShadow: '0 0 10px rgba(255, 107, 53, 0.8)'
-                    }}
-                    transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  >
-                    {item.name}
-                  </motion.span>
+                      className="relative z-10 font-medium px-3 py-2 block"
+                      whileHover={{ 
+                        scale: 1.06,
+                        textShadow: '0 0 12px rgba(255, 107, 53, 0.9)'
+                      }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                    >
+                      {item.name}
+                    </motion.span>
                   
                   {/* Racing background with speed lines */}
                   <motion.div
                     className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-lg -z-10 overflow-hidden"
                     initial={{ scale: 0, opacity: 0 }}
                     whileHover={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    transition={{ duration: 0.18, ease: 'easeOut' }}
                   >
                     {/* Speed lines effect */}
                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -91,7 +91,7 @@ export async function getTeamMembers() {
         name: 'Ankush Gowda',
         role: 'Club Manager',
         domain: 'Marketing',
-        bio: 'Absolute Cinema',
+        bio: 'Ignore me',
         photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
