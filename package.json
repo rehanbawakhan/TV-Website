@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "db:create-form-schema": "node scripts/create_form_schema.js",
+  "db:create-hackathon-table": "node scripts/create_hackathon_table.js",
     "lint": "next lint"
   },
   "dependencies": {
