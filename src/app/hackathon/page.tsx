@@ -22,8 +22,6 @@ interface FormData {
   email: string
   phone: string
   members: Member[]
-  experience: string
-  idea: string
   campus?: string
   proposalPdf?: File | null
   
@@ -43,9 +41,7 @@ export default function HackathonRegister() {
       { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
       { name: '', srn: '', email: '', phone: '', semester: '', section: '' }
     ],
-    experience: '',
-    idea: ''
-    ,
+    
     campus: '',
     proposalPdf: null,
     
@@ -68,7 +64,8 @@ export default function HackathonRegister() {
         )).length
         return validCount >= 2
       case 3:
-        return formData.experience.trim() && formData.idea.trim()
+        // final review step - no additional required fields
+        return true
       default:
         return true
     }
@@ -100,8 +97,7 @@ export default function HackathonRegister() {
         phone: formData.phone,
         campus: formData.campus,
         members: filteredMembers,
-        experience: formData.experience,
-        idea: formData.idea,
+        // experience & idea fields removed per request
         proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
       }
 
@@ -122,8 +118,6 @@ export default function HackathonRegister() {
     }
   }
 
-  const [paymentPortalUrl, setPaymentPortalUrl] = useState<string | null>(null)
-
   // fetch form schema if available to allow admin-driven forms
   useEffect(() => {
     let mounted = true
@@ -141,21 +135,7 @@ export default function HackathonRegister() {
     return () => { mounted = false }
   }, [])
 
-  useEffect(() => {
-    let mounted = true
-    ;(async () => {
-      try {
-        const res = await fetch('/api/site/settings')
-        if (!res.ok) return
-        const json = await res.json()
-        if (!mounted) return
-        setPaymentPortalUrl(json.paymentPortalUrl || null)
-      } catch (e) {
-        // ignore
-      }
-    })()
-    return () => { mounted = false }
-  }, [])
+  // No payment flow for Ignition registrations — final step is a plain confirmation.
 
   return (
     <div className="min-h-screen bg-gradient-black">
@@ -482,7 +462,8 @@ export default function HackathonRegister() {
                     (() => {
                       const fields = formSchema.fields as any[]
                       const membersIndex = fields.findIndex(f => f.type === 'members')
-                      const tail = membersIndex === -1 ? [] : fields.slice(membersIndex + 1)
+                      // Exclude legacy fields 'experience' and 'idea' from the review inputs
+                      const tail = membersIndex === -1 ? [] : fields.slice(membersIndex + 1).filter((f: any) => f.name !== 'experience' && f.name !== 'idea')
                       if (!tail.length) return null
                       return (
                         <div className="mt-4 space-y-4">
@@ -564,26 +545,37 @@ export default function HackathonRegister() {
                   transition={{ duration: 0.5 }}
                 >
                   <div className="text-6xl mb-4">🏁</div>
-                  <h2 className="text-2xl font-bold text-white mb-4">Payment Portal</h2>
+                  <h2 className="text-2xl font-bold text-white mb-4">Registration submitted</h2>
                   <p className="text-gray-400 mb-8">
-                    Complete your registration with secure payment
+                    Thank you — your team has been registered for Ignition 1.0. We'll contact the team leader at the provided email with next steps.
                   </p>
-                  <div className="bg-gradient-orange p-8 rounded-xl text-white">
-                    <h3 className="text-xl font-semibold mb-4">Payment</h3>
-                    <p className="mb-4">Complete your registration payment using the organiser's payment portal.</p>
-                    <p className="mb-6">Team: {formData.teamName}</p>
-                    <button
-                      onClick={() => {
-                        if (paymentPortalUrl) {
-                          window.open(paymentPortalUrl, '_blank')
-                        } else {
-                          toast.error('Payment portal not configured. Please contact the organisers.')
-                        }
-                      }}
-                      className="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
-                    >
-                      Open Payment Portal
-                    </button>
+                  <div className="bg-gradient-orange p-8 rounded-xl text-white inline-block">
+                    <h3 className="text-xl font-semibold mb-2">Team: {formData.teamName || '—'}</h3>
+                    <div className="mt-4">
+                      <button
+                        onClick={() => {
+                          // Reset form or navigate away — here we reset to step 1 and clear the form
+                          setFormData({
+                            teamName: '',
+                            teamLeader: '',
+                            email: '',
+                            phone: '',
+                            members: [
+                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
+                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
+                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
+                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' }
+                            ],
+                            campus: '',
+                            proposalPdf: null,
+                          })
+                          setStep(1)
+                        }}
+                        className="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                      >
+                        Done
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               </div>
@@ -608,7 +600,7 @@ export default function HackathonRegister() {
                     disabled={!isStepValid()}
                     className="px-6 py-3 bg-gradient-orange text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                   >
-                    {step === 3 ? 'Proceed to Payment' : 'Next'}
+                    {step === 3 ? 'Submit' : 'Next'}
                   </button>
                 </div>
               </div>

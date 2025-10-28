@@ -4,92 +4,61 @@ import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
 
-const sections = [
-      {
-        title: 'Competition Overview',
-        icon: '🏁',
-        content: [
-          'VegaHack is a 48-hour racing-themed hackathon where innovation meets velocity',
-          'Teams can have up to 4 members including the team leader',
-          'Winners will receive cash prizes, certificates, and exclusive internship opportunities'
-        ]
-      },
-  {
-    title: 'Eligibility Criteria',
-    icon: '🏎️',
-    content: [
-      'Open to all undergraduate and graduate students',
-      'Team members must be currently enrolled in any recognized educational institution',
-      'Each participant can only be part of one team',
-      'Valid student ID required during registration verification'
-    ]
-  },
-  {
-    title: 'Domains & Tracks',
-    icon: '⚙️',
-    content: [
-      'Automotive Tech: Vehicle automation, IoT integration, safety systems',
-      'Robotics & AI: Autonomous systems, machine learning, computer vision',
-      'Design Innovation: UI/UX, product design, creative solutions',
-      'Media Technology: AR/VR, content creation, digital experiences',
-      'Digital Marketing: Growth hacking, analytics, social media innovation'
-    ]
-  },
-  {
-    title: 'Rules & Regulations',
-    icon: '📋',
-    content: [
-      'All code must be written during the hackathon period (48 hours)',
-      'Open source libraries and APIs are allowed',
-      'Pre-built solutions or existing projects are strictly prohibited',
-      'Teams must present their solution within the 5-minute time limit',
-      'All team members must be present during the final presentation'
-    ]
-  },
-  {
-    title: 'Judging Criteria',
-    icon: '🏆',
-    content: [
-      'Innovation & Creativity (25%): Originality and uniqueness of the solution',
-      'Technical Implementation (25%): Code quality, architecture, and functionality',
-      'Business Viability (20%): Market potential and practical application',
-      'Presentation (15%): Communication skills and demo effectiveness',
-      'Design & User Experience (15%): Interface design and user interaction'
-    ]
-  },
-  {
-    title: 'Resources Provided',
-    icon: '🚀',
-    content: [
-      'High-speed internet and power outlets for all teams',
-      'Mentorship from industry experts and Vegavath alumni',
-      'Access to cloud platforms and development tools',
-      'Meals and refreshments throughout the event',
-      'Hardware kits for robotics and IoT projects (limited availability)'
-    ]
-  },
-  {
-    title: 'Schedule Overview',
-    icon: '⏰',
-    content: [
-      'Day 1: Registration, team formation, problem statement reveal',
-      'Day 1-2: Development phase with mentor support',
-      'Day 2: Final presentations and judging',
-      'Day 2: Awards ceremony and networking session'
-    ]
-  },
-  {
-    title: 'Code of Conduct',
-    icon: '🤝',
-    content: [
-      'Maintain respectful and professional behavior throughout the event',
-      'No harassment, discrimination, or inappropriate conduct will be tolerated',
-      'Respect intellectual property and give proper attributions',
-      'Report any violations to the organizing committee immediately',
-      'Violation of code of conduct may result in immediate disqualification'
-    ]
-  }
-]
+// Ignition 1.0 specific guidelines content
+const pdfPath = "/assets/PDF's/IgnitionProblemStatementBrief.pdf"
+
+const ignitionContent = {
+  overview: `Ignition 1.0 is an 18-hour IoT overnight hackathon. Teams can have up to 4 members, including the team leader. Winners will receive cash prizes, certificates, and a chance to intern at Ather Energy. In this hackathon, teams will design and demonstrate a wearable telemetry system that can be mounted on a rider’s gear to capture and visualise movement and ride data in real time. Your prototype should combine hardware sensors and a mobile or web application to sense, transmit, and display information about the rider’s motion and location. The goal is to produce a working demo that clearly shows how sensor data can reveal useful insights about how a person rides or moves. You may also use a smartphone as a sensing device by mounting it on the riding gear. This sensing phone will collect motion and GPS data, while a second phone (or separate app interface) can be used to view live data, map visualization, and logs.`,
+
+  eligibility: `Open to all engineering background students across both Electronic City and Ring Road Campus. Team members must be currently enrolled in PES University and part of the current academic year. Each Participant can be part of only one team. A valid PES student ID card is mandatory.`,
+
+  expectations: [
+    'Motion sensing: accelerometer, gyroscope, IMU module, or smartphone sensors',
+    'Position tracking: GPS module or phone GPS API',
+    'Wireless data transfer: BLE, Wi-Fi, or direct USB connection',
+    'Mobile or web visualization: Android app, React web dashboard, etc.',
+    'On-device data logging: SD card, local phone storage that can be exported as a simple CSV/JSON file',
+    'Low-cost, easy-to-mount sensors are preferred (ESP32, Arduino, MPU IMUs, GPS modules).',
+  ],
+
+  deliverables: [
+    'A functioning prototype mounted on the provided riding gear (helmet, riding jacket, and riding pants)',
+    'A live demo showing sensor readings and location tracking',
+    'A brief explanation of how your system works and what insights it can provide',
+  ],
+
+  codeOfConduct: [
+    'All code must be written during the hackathon period (18 hours)',
+    'Open source libraries and APIs are allowed',
+    'Pre-built solutions or existing projects are strictly prohibited',
+    'Teams must present their solution within their allotted time limit',
+    'All team members must be present during the final presentation',
+    'Maintain respectful and professional behavior throughout the event',
+    'No harassment, discrimination, or inappropriate conduct will be tolerated',
+    'Respect intellectual property and give proper attributions',
+    'Report any violations to the organizing committee immediately',
+    'Violation of code of conduct may result in immediate disqualification',
+    'Alcohol and Smoking is strictly condemned in campus premises',
+    'Carrying of any sharp or pointy objects is not allowed',
+  ],
+
+  judging: 'To be revealed on the day of hackathon',
+
+  resources: [
+    'High-speed internet and power outlets for all teams',
+    'Mentorship from industry experts and experienced faculty',
+    'Dinner, Breakfast, Midnight Pizza and unlimited caffeine',
+    'Hardware kits for projects (limited availability)'
+  ],
+
+  innovation: 'Teams are encouraged to go beyond the mandatory requirements and add an innovative feature that enhances rider experience, safety, data analysis, or usability, as long as it can be demonstrated live during the final test.',
+
+  prizes: [
+    { title: '1st prize', amount: '₹16,000' },
+    { title: '2nd prize', amount: '₹12,000' },
+    { title: 'Innovation Challenge', amount: '₹7,000' },
+  ]
+}
 
 export default function GuidelinesPage() {
   const [headerRef, headerInView] = useInView({
@@ -171,7 +140,7 @@ export default function GuidelinesPage() {
                 textShadow: '0 0 30px rgba(249, 115, 22, 0.8)'
               }}
             >
-              VegaHack
+              Ignition 1.0
               {/* Holographic scan effect */}
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent"
@@ -233,9 +202,9 @@ export default function GuidelinesPage() {
                 scale: 1.05
               }}
             >
-              VegaHack 2024
+              Ignition 1.0
             </motion.span>
-            {' '}- The ultimate racing-themed hackathon where innovation meets velocity.
+            {' '}- An 18-hour IoT overnight hackathon where practical hardware & live telemetry meet rapid prototyping.
           </motion.p>
 
           {/* Quick stats */}
@@ -246,9 +215,9 @@ export default function GuidelinesPage() {
             transition={{ duration: 0.8, delay: 0.4 }}
           >
             {[
-              { label: 'Duration', value: '48h', icon: '⏰' },
-              { label: 'Prize Pool', value: '₹50K+', icon: '💰' },
-              { label: 'Domains', value: '5', icon: '🎯' }
+              { label: 'Duration', value: '18h', icon: '⏰' },
+              { label: 'Prize Pool', value: '₹35K+', icon: '💰' },
+              { label: 'Date', value: '7th Nov', icon: '📅' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -285,118 +254,89 @@ export default function GuidelinesPage() {
       {/* Guidelines Sections */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {sections.map((section, index) => (
-              <motion.div
-                key={section.title}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="group bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl p-6 hover:border-blue-500/50 transition-all duration-300 relative overflow-hidden"
-                whileHover={{ 
-                  scale: 1.02,
-                  boxShadow: '0 10px 30px rgba(59, 130, 246, 0.1)'
-                }}
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-orange-500/6 backdrop-blur-sm border border-orange-600/10 rounded-2xl p-8 shadow-lg">
+              <div className="flex justify-between items-start mb-6">
+              <h2 className="text-3xl font-bold">Ignition 1.0 — Guidelines</h2>
+              <a
+                href={encodeURI(pdfPath)}
+                download
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 border border-blue-500 text-blue-400 rounded-lg hover:bg-blue-600/10"
               >
-                {/* Racing stripe accent */}
-                <motion.div
-                  className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600"
-                  initial={{ scaleX: 0 }}
-                  whileInView={{ scaleX: 1 }}
-                  transition={{ duration: 0.8, delay: index * 0.1 + 0.3 }}
-                />
+                📄 Download Problem Brief
+              </a>
+            </div>
+              <div className="prose prose-invert max-w-none">
+                <div className="space-y-8">
+                  <section>
+                    <h3>Overview</h3>
+                    <p className="lead">{ignitionContent.overview}</p>
+                  </section>
 
-                {/* Tech pattern overlay */}
-                <div className="absolute inset-0 opacity-5">
-                  <div className="grid grid-cols-8 grid-rows-6 h-full w-full">
-                    {[...Array(48)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="border border-cyan-400/30"
-                        animate={{ 
-                          opacity: [0.1, 0.3, 0.1]
-                        }}
-                        transition={{ 
-                          duration: 3, 
-                          delay: i * 0.02,
-                          repeat: Infinity 
-                        }}
-                      />
-                    ))}
-                  </div>
+                  <section>
+                    <h3>Eligibility</h3>
+                    <p>{ignitionContent.eligibility}</p>
+                  </section>
+
+                  <section>
+                    <h3>Expectations</h3>
+                    <ul>
+                      {ignitionContent.expectations.map((x, i) => (
+                        <li key={i}>{x}</li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3>Deliverables</h3>
+                    <ol>
+                      {ignitionContent.deliverables.map((d, i) => (
+                        <li key={i}>{d}</li>
+                      ))}
+                    </ol>
+                  </section>
+
+                  <section>
+                    <h3>Rules & Code of Conduct</h3>
+                    <ul>
+                      {ignitionContent.codeOfConduct.map((c, i) => (
+                        <li key={i}>{c}</li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3>Judging Criteria</h3>
+                    <p>{ignitionContent.judging}</p>
+                  </section>
+
+                  <section>
+                    <h3>Resources Provided</h3>
+                    <ul>
+                      {ignitionContent.resources.map((r, i) => (
+                        <li key={i}>{r}</li>
+                      ))}
+                    </ul>
+                  </section>
+
+                  <section>
+                    <h3>Innovation Challenge</h3>
+                    <p>{ignitionContent.innovation}</p>
+                  </section>
+
+                  <section>
+                    <h3>Prize Pool</h3>
+                    <ul>
+                      {ignitionContent.prizes.map((p, i) => (
+                        <li key={i}>{p.title}: <strong>{p.amount}</strong></li>
+                      ))}
+                    </ul>
+                  </section>
                 </div>
-
-                <div className="relative z-10">
-                  <div className="flex items-center space-x-4 mb-6">
-                    <motion.div 
-                      className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-2xl relative overflow-hidden"
-                      whileHover={{ 
-                        scale: 1.1,
-                        boxShadow: '0 0 20px rgba(59, 130, 246, 0.5)'
-                      }}
-                      animate={{ 
-                        rotateY: [0, 360]
-                      }}
-                      transition={{ 
-                        duration: 4, 
-                        delay: index * 0.5,
-                        repeat: Infinity,
-                        repeatDelay: 3
-                      }}
-                    >
-                      {section.icon}
-                      
-                      {/* Holographic effect */}
-                      <motion.div
-                        className="absolute inset-0 opacity-40"
-                        animate={{ 
-                          background: [
-                            'linear-gradient(45deg, transparent 40%, rgba(34,211,238,0.3) 50%, transparent 60%)',
-                            'linear-gradient(135deg, transparent 40%, rgba(34,211,238,0.3) 50%, transparent 60%)',
-                            'linear-gradient(225deg, transparent 40%, rgba(34,211,238,0.3) 50%, transparent 60%)',
-                            'linear-gradient(315deg, transparent 40%, rgba(34,211,238,0.3) 50%, transparent 60%)'
-                          ]
-                        }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity
-                        }}
-                      />
-                    </motion.div>
-
-                    <motion.h3 
-                      className="text-2xl font-bold text-white group-hover:text-blue-300 transition-colors"
-                      whileHover={{ x: 5 }}
-                    >
-                      {section.title}
-                    </motion.h3>
-                  </div>
-
-                  <ul className="space-y-3">
-                    {section.content.map((item, itemIndex) => (
-                      <motion.li
-                        key={itemIndex}
-                        className="flex items-start space-x-3 text-gray-300 group-hover:text-gray-200 transition-colors"
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: index * 0.1 + itemIndex * 0.1 }}
-                        whileHover={{ x: 5 }}
-                      >
-                        <motion.span 
-                          className="text-blue-400 mt-1 flex-shrink-0"
-                          whileHover={{ scale: 1.2, rotate: 360 }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          ▶
-                        </motion.span>
-                        <span className="leading-relaxed">{item}</span>
-                      </motion.li>
-                    ))}
-                  </ul>
-                </div>
-              </motion.div>
-            ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -37,6 +37,20 @@ export async function POST(req: Request) {
       const base64 = commaIndex >= 0 ? dataUrl.slice(commaIndex + 1) : dataUrl
       const buffer = Buffer.from(base64, 'base64')
       const safeName = `${prefix}_${Date.now()}_${name.replace(/\s+/g, '_')}`
+
+      // Ensure bucket exists (create if missing). If bucket already exists, createBucket will return an error which we can ignore.
+      try {
+        // Supabase storage createBucket may error if bucket exists; ignore non-fatal errors
+        // @ts-ignore
+        const { error: createErr } = await supabaseAdmin.storage.createBucket(bucket, { public: true })
+        if (createErr) {
+          // ignore create errors (bucket may already exist or permission issues)
+          console.warn('createBucket error (ignored):', createErr)
+        }
+      } catch (e) {
+        // ignore
+      }
+
       // Upload buffer
       const { error: uploadError } = await supabaseAdmin.storage.from(bucket).upload(safeName, buffer, { upsert: true })
       if (uploadError) throw uploadError
@@ -66,8 +80,7 @@ export async function POST(req: Request) {
       leader_phone: phone,
       campus: campus || null,
       members: members || [],
-      experience: experience || null,
-      idea: idea || null,
+      // experience & idea removed from registration payload
       proposal_pdf_url: proposalUrl,
     }
 
