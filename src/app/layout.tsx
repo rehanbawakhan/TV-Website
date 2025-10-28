@@ -26,7 +26,7 @@ export const metadata = {
     'Students',
     'Club',
     'Racing',
-    'VegaHack',
+    'Ignition',
     'Hackathon'
   ],
   authors: [{ name: 'Vegavath Technical Club' }],

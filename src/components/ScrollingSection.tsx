@@ -217,14 +217,13 @@ export default function ScrollingSection() {
             <h2 className="text-4xl md:text-6xl font-bold text-white mb-8">
               <span className="text-transparent bg-clip-text bg-gradient-orange">
                 Ignition 1.0
-              </span>{' '}
-              2025
+              </span>
             </h2>
 
             <p className="text-xl text-gray-300 leading-relaxed mb-8">
-              Join us for the ultimate 18-hour coding and hardware marathon! Experience the thrill of 
-              innovation, where the fastest minds race against time to build 
-              groundbreaking solutions. Rev up your engines for Ignition 1.0, on 7th and 8th November, 2025!
+              Join us for the ultimate 18-hour coding and hardware marathon! Experience the thrill of
+              innovation, where the fastest minds race against time to build
+              groundbreaking solutions. Rev up your engines for Ignition 1.0, on 7th and 8th November!
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -235,13 +234,13 @@ export default function ScrollingSection() {
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
                 <div className="text-3xl mb-3">🏆</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">₹50,000</h3>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">₹35K+</h3>
                 <p className="text-gray-400 text-sm">Prize pool</p>
               </div>
               <div className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-6 rounded-xl border border-orange-500/30">
-                <div className="text-3xl mb-3">🎯</div>
-                <h3 className="text-lg font-semibold text-orange-400 mb-2">Fun Events</h3>
-                <p className="text-gray-400 text-sm">Exciting Goodies</p>
+                <div className="text-3xl mb-3">📅</div>
+                <h3 className="text-lg font-semibold text-orange-400 mb-2">7th Nov</h3>
+                <p className="text-gray-400 text-sm">Event date</p>
               </div>
             </div>
 

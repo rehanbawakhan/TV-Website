@@ -1,14 +1,50 @@
-'use client'
+"use client"
 
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
 // Load the heavy 3D scene only on the client to avoid SSR evaluation issues
 
 export default function HeroSection() {
+  useEffect(() => {
+    // Load model-viewer script once
+    if (!document.getElementById('model-viewer-script')) {
+      const s = document.createElement('script')
+      s.id = 'model-viewer-script'
+      s.src = 'https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js'
+      s.defer = true
+      document.head.appendChild(s)
+    }
+
+    const container = document.getElementById('gokart-model')
+    if (container) {
+      // inject the model-viewer tag; model file should be placed at public/models/gokart.glb
+      container.innerHTML = `
+        <model-viewer
+          src="/models/gokart.glb"
+          alt="Gokart 3D Model"
+          auto-rotate
+          camera-controls
+          exposure="1"
+          shadow-intensity="1"
+          ar
+          ar-modes="webxr scene-viewer quick-look"
+          style="width:100%;height:100%;"
+        ></model-viewer>
+      `
+    }
+  }, [])
+
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden bg-gradient-black">
+      {/* Large background wordmark */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+        <h2 className="font-extrabold text-white/6 uppercase tracking-widest select-none" style={{fontSize: '20rem', lineHeight: 0.8}}>
+          VEGAVATH
+        </h2>
+      </div>
+
       {/* 3D Background + overlays */}
       <div className="absolute inset-0">
         {/* 3D scene in its own low z-index, non-interactive layer */}
@@ -183,7 +219,7 @@ export default function HeroSection() {
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl animate-pulse-slow delay-1000"></div>
       
       {/* Enhanced Interactive Elements */}
-      <div className="absolute top-1/2 left-1/2 w-80 h-80 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+  <div className="absolute top-1/2 left-1/2 w-80 h-80 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
         <motion.div
           className="absolute inset-0 border border-orange-400/20 rounded-full"
           animate={{ rotate: 360 }}
@@ -199,6 +235,14 @@ export default function HeroSection() {
           animate={{ rotate: 360 }}
           transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
         />
+      </div>
+
+      {/* 3D Gokart Model (frosted glass card) */}
+      <div className="absolute right-8 top-1/2 transform -translate-y-1/2 z-30">
+        <div className="w-96 h-64 bg-white/6 backdrop-blur-md border border-white/10 rounded-2xl p-3 flex items-center justify-center shadow-lg">
+          {/* model-viewer will be injected here on the client */}
+          <div id="gokart-model" className="w-full h-full" />
+        </div>
       </div>
       
       {/* Floating particles */}

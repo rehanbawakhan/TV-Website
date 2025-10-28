@@ -1,8 +1,8 @@
 import GuidelinesPage from '@/components/GuidelinesPage'
 
 export const metadata = {
-  title: 'VegaHack Guidelines - Vegavath Technical Club',
-  description: 'Complete guidelines and rules for VegaHack - The ultimate racing-themed hackathon',
+  title: 'Ignition Guidelines - Vegavath Technical Club',
+  description: 'Complete guidelines and rules for Ignition 1.0 — an 18-hour IoT hackathon',
 }
 
 export default function Guidelines() {

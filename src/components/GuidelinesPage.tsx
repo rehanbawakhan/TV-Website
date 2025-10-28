@@ -204,7 +204,7 @@ export default function GuidelinesPage() {
             >
               Ignition 1.0
             </motion.span>
-            {' '}- An 18-hour IoT overnight hackathon where practical hardware & live telemetry meet rapid prototyping.
+            {' '}- An 18-hour IoT hackathon where practical hardware & live telemetry meet rapid prototyping.
           </motion.p>
 
           {/* Quick stats */}
@@ -379,7 +379,7 @@ export default function GuidelinesPage() {
             viewport={{ once: true }}
             className="text-xl text-gray-300 mb-12"
           >
-            Join VegaHack 2024 and experience the thrill of innovation. Register now and be part of the ultimate racing-themed hackathon!
+            Join Ignition 1.0 and experience the thrill of innovation. Register now and be part of the ultimate racing-themed hackathon!
           </motion.p>
 
           <motion.div
@@ -398,7 +398,7 @@ export default function GuidelinesPage() {
               whileTap={{ scale: 0.98 }}
               onClick={() => window.location.href = '/ignition'}
             >
-              <span className="relative z-10">🏁 Register for VegaHack</span>
+              <span className="relative z-10">🏁 Register for Ignition</span>
               <motion.div 
                 className="absolute inset-0 bg-white/20"
                 initial={{ scale: 0 }}

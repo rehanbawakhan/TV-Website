@@ -102,8 +102,8 @@ export default function AdminPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([
     {
       id: '1',
-      title: 'VegaHack 2024 Registration Open',
-      content: 'Registration for VegaHack 2024 is now open! Join us for 48 hours of intensive coding and innovation.',
+      title: 'Ignition 1.0 Registration Open',
+      content: 'Registration for Ignition 1.0 is now open! Join us for 18 hours of rapid prototyping and innovation.',
       type: 'success',
       createdAt: '2024-10-10T12:00:00Z',
       active: true
