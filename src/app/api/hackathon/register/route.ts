@@ -19,7 +19,8 @@ export async function POST(req: Request) {
     } = body
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY as string
+    // Accept either SUPABASE_SERVICE_ROLE or SUPABASE_SERVICE_ROLE_KEY for compatibility
+    const serviceRoleKey = (process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_SERVICE_ROLE_KEY) as string
     if (!supabaseUrl || !serviceRoleKey) {
       return NextResponse.json({ error: 'Supabase not configured (server).' }, { status: 500 })
     }
@@ -72,29 +73,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'File upload failed' }, { status: 500 })
     }
 
-    // Insert registration row
-    const payload = {
+    // Insert registration row - include all available fields. Ensure members is stored as JSONB.
+    const payload: any = {
       team_name: teamName,
       leader_name: teamLeader,
       leader_email: email,
       leader_phone: phone,
       campus: campus || null,
       members: members || [],
-      // experience & idea removed from registration payload
+      experience: experience || null,
+      idea: idea || null,
       proposal_pdf_url: proposalUrl,
     }
 
-    const { data, error } = await supabaseAdmin
-      .from('hackathon_registrations')
-      .insert([payload])
-      .select()
+    try {
+      const { data, error } = await supabaseAdmin
+        .from('hackathon_registrations')
+        .insert([payload])
+        .select()
 
-    if (error) {
-      console.error('Insert error:', error)
-      return NextResponse.json({ error: 'DB insert failed' }, { status: 500 })
+      if (error) {
+        console.error('Insert error details:', error)
+        return NextResponse.json({ error: 'DB insert failed', details: error }, { status: 500 })
+      }
+
+      return NextResponse.json({ success: true, data: data?.[0] })
+    } catch (dbErr) {
+      console.error('Unexpected DB error:', dbErr)
+      return NextResponse.json({ error: 'Unexpected DB error', details: String(dbErr) }, { status: 500 })
     }
-
-    return NextResponse.json({ success: true, data: data?.[0] })
   } catch (err) {
     console.error(err)
     return NextResponse.json({ error: 'Unhandled error' }, { status: 500 })
