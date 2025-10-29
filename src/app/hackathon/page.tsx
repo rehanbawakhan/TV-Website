@@ -82,13 +82,6 @@ export default function HackathonRegister() {
   const handleSubmit = async () => {
     // Prevent spamming the submit button and redirect immediately when a proposal is present.
     if (submitting) return
-    // If there's no selected file, show inline error and do not proceed.
-    if (!formData.proposalPdf) {
-      setProposalError('Please upload a proposal PDF to submit your registration.')
-      return
-    }
-
-    setProposalError(null)
     setSubmitting(true)
 
     // Launch background submission (do not await) so the user is redirected instantly.
@@ -96,16 +89,6 @@ export default function HackathonRegister() {
       try {
         const filteredMembers = formData.members.filter((m) => m.name && m.name.trim())
 
-        // Helper: convert file to data URL
-        const fileToDataUrl = (file: File | null | undefined) => new Promise<string | null>((resolve) => {
-          if (!file) return resolve(null)
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = () => resolve(null)
-          reader.readAsDataURL(file)
-        })
-
-        const proposalData = await fileToDataUrl((formData as any).proposalPdf)
         const payload = {
           teamName: formData.teamName,
           teamLeader: formData.teamLeader,
@@ -113,7 +96,8 @@ export default function HackathonRegister() {
           phone: formData.phone,
           campus: formData.campus,
           members: filteredMembers,
-          proposalPdf: proposalData ? { name: (formData as any).proposalPdf.name, data: proposalData } : null,
+          // proposal removed per updated flow — will be provided later via WhatsApp group
+          proposalPdf: null,
         }
 
         const res = await fetch('/api/hackathon/register', {
@@ -139,7 +123,7 @@ export default function HackathonRegister() {
     })()
 
     // Immediately redirect the user to the submitted page to avoid double submissions.
-    toast.success('Registration submitted — uploading in background. Redirecting...')
+    toast.success('Registration submitted — details saved. Redirecting...')
     router.push('/hackathon/submitted')
   }
 
@@ -229,6 +213,8 @@ export default function HackathonRegister() {
                         <div className="space-y-4">
                           {stepFields.map((field) => {
                             const key = field.name
+                            // Hide the proposal PDF input from the registration form per updated flow
+                            if (key === 'proposalPdf') return null
                             const value = (formData as any)[key] || ''
                             if (field.type === 'select') {
                               return (
@@ -259,22 +245,8 @@ export default function HackathonRegister() {
                             }
 
                             if (field.type === 'file') {
-                              return (
-                                <div key={key} className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
-                                  <label className="block text-sm text-gray-300 mb-2">{field.label || key}</label>
-                                  <input
-                                    type="file"
-                                    accept={field.accept || '*/*'}
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0] || null
-                                      setFormData({...formData, [key]: file})
-                                      // clear proposal error when user selects a file
-                                      setProposalError(null)
-                                    }}
-                                    className="w-full text-sm text-gray-300"
-                                  />
-                                </div>
-                              )
+                              // Skip rendering file inputs (especially proposalPdf which is handled separately)
+                              return null
                             }
 
                             // default to input types
@@ -511,21 +483,8 @@ export default function HackathonRegister() {
                             }
 
                             if (field.type === 'file') {
-                              return (
-                                <div key={key} className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
-                                  <label className="block text-sm text-gray-300 mb-2">{field.label || key}</label>
-                                  <input
-                                    type="file"
-                                    accept={field.accept || '*/*'}
-                                    onChange={(e) => {
-                                      const file = e.target.files?.[0] || null
-                                      setFormData({...formData, [key]: file})
-                                      setProposalError(null)
-                                    }}
-                                    className="w-full text-sm text-gray-300"
-                                  />
-                                </div>
-                              )
+                              // Do not render file inputs during review — proposal will be collected later
+                              return null
                             }
 
                             // default input
@@ -544,23 +503,12 @@ export default function HackathonRegister() {
                       )
                     })()
                   ) : (
-                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-4 border border-gray-700 rounded-lg bg-gray-900/40">
-                        <label className="block text-sm text-gray-300 mb-2">Proposed Solution (PDF)</label>
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0] || null
-                            setFormData({...formData, proposalPdf: file})
-                            setProposalError(null)
-                          }}
-                          className="w-full text-sm text-gray-300"
-                        />
-                        {proposalError && (
-                          <div className="mt-2 text-sm text-red-400" role="alert" aria-live="polite">{proposalError}</div>
-                        )}
-                        <div className="mt-2 text-xs text-gray-400">Upload a single PDF containing your proposed solution.</div>
+                    <div className="mt-6">
+                      <div className="p-6 rounded-lg bg-gray-900/40 border border-gray-700 text-center">
+                        <p className="text-red-400 text-lg font-semibold" style={{ textShadow: '0 0 8px rgba(220,38,38,0.6)' }}>
+                          Payments will begin on friday and subsequent form will be shared in the Whatsapp Group
+                        </p>
+                        <p className="mt-3 text-xs text-gray-400">Please join the WhatsApp group for payment details and follow-up forms.</p>
                       </div>
                     </div>
                   )}

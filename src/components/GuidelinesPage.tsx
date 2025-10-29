@@ -127,6 +127,17 @@ export default function GuidelinesPage() {
         </div>
 
         <div className="max-w-6xl mx-auto text-center relative z-10">
+          {/* WhatsApp group link (top) */}
+          <div className="mb-6">
+            <a
+              href="https://chat.whatsapp.com/FTCvjQ1Z6TVKD75GrVHEJe?mode=wwt"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md"
+            >
+              🔗 Join the WhatsApp group for updates
+            </a>
+          </div>
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
