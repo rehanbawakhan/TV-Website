@@ -11,10 +11,11 @@ interface Member {
   srn: string
   email: string
   phone: string
-  semester: string
+  // semester may be one or more selections (checkbox-style); store as string[] for consistency
+  semester: string[]
   section: string
-  department?: string
-  hostel?: string
+  department?: string[]
+  hostel?: string[]
   // Payment upload preview/holder (client only) - serialized to { name, data } (data is dataURL) when sending
   paymentName?: string
   paymentDataUrl?: string
@@ -37,26 +38,63 @@ export default function HackathonRegister() {
   const [formSchema, setFormSchema] = useState<any | null>(null)
   const [proposalError, setProposalError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [stepError, setStepError] = useState<string | null>(null)
+  const [memberErrors, setMemberErrors] = useState<(string | null)[]>([null, null, null, null])
   const [formData, setFormData] = useState<FormData>({
     teamName: '',
     teamLeader: '',
     email: '',
     phone: '',
     members: [
-      { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-      { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-      { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-      { name: '', srn: '', email: '', phone: '', semester: '', section: '' }
+      { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+      { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+      { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+      { name: '', srn: '', email: '', phone: '', semester: [], section: '' }
     ],
-    
     campus: '',
     proposalPdf: null,
-    
   })
 
   const handleNext = () => {
-    if (step < 3 && isStepValid()) {
-      setStep(step + 1)
+    setStepError(null)
+    setMemberErrors([null, null, null, null])
+    if (step < 3) {
+      // run validation and show errors if any
+      const valid = isStepValid()
+      if (valid) {
+        setStep(step + 1)
+      } else {
+        // build human-friendly messages
+        if (step === 1) {
+          setStepError('Please fill all required fields on this step and ensure email/phone are valid.')
+        }
+        if (step === 2) {
+          // per-member missing fields
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          const phoneRegex = /^\d{10}$/
+          const errs: (string | null)[] = [null, null, null, null]
+          formData.members.forEach((member, idx) => {
+            if (idx >= 3) return
+            const missing: string[] = []
+            if (!member.name || !member.name.trim()) missing.push('Name')
+            if (!member.srn || !member.srn.trim()) missing.push('SRN')
+            if (!member.email || !member.email.trim() || !emailRegex.test(member.email)) missing.push('Email')
+            if (!member.phone || !member.phone.trim() || !phoneRegex.test(member.phone)) missing.push('Phone')
+            const semOk = Array.isArray(member.semester) && member.semester.length > 0
+            if (!semOk) missing.push('Semester')
+            if (!member.section || !member.section.trim()) missing.push('Section')
+            const deptOk = (member as any).department ? ((Array.isArray((member as any).department) ? (member as any).department.length > 0 : !!(member as any).department)) : false
+            if (!deptOk) missing.push('Department')
+            const hostelOk = (member as any).hostel ? ((Array.isArray((member as any).hostel) ? (member as any).hostel.length > 0 : !!(member as any).hostel)) : false
+            if (!hostelOk) missing.push('Hostel/Day Scholar')
+            if (!member.paymentDataUrl) missing.push('Payment acknowledgement')
+            errs[idx] = missing.length ? `Missing: ${missing.join(', ')}` : null
+          })
+          setMemberErrors(errs)
+          setStepError('Please complete the highlighted member fields before continuing.')
+        }
+      }
     }
   }
   
@@ -80,14 +118,14 @@ export default function HackathonRegister() {
         // and for member 4 only if that member exists (name provided).
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         const phoneRegex = /^\d{10}$/
-        const completeMembers = formData.members.filter(member => (
-          member.name && member.name.trim() &&
-          member.srn && member.srn.trim() &&
-          member.email && member.email.trim() && emailRegex.test(member.email) &&
-          member.phone && member.phone.trim() && phoneRegex.test(member.phone) &&
-          member.semester && member.semester.trim() &&
-          member.section && member.section.trim()
-        ))
+    const completeMembers = formData.members.filter(member => (
+      member.name && member.name.trim() && 
+      member.srn && member.srn.trim() && 
+      member.email && member.email.trim() && emailRegex.test(member.email) && 
+      member.phone && member.phone.trim() && phoneRegex.test(member.phone) && 
+            Array.isArray(member.semester) && member.semester.length > 0 &&
+      member.section && member.section.trim()
+    ))
 
         // Payment checks: first three must have payments (since min team size 3). Fourth required only if present.
         const paymentsOk = formData.members.slice(0, 3).every((m) => !!m.paymentDataUrl) &&
@@ -232,6 +270,9 @@ export default function HackathonRegister() {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Hackathon Registration Details</h2>
                       <div className="space-y-4">
+                          {stepError && step === 1 && (
+                            <div className="p-3 bg-red-900/50 border border-red-700 text-red-200 rounded-md">{stepError}</div>
+                          )}
                   {formSchema && Array.isArray(formSchema.fields) ? (
                     (() => {
                       const fields = formSchema.fields as any[]
@@ -335,9 +376,12 @@ export default function HackathonRegister() {
                             placeholder="Email"
                             value={formData.email}
                             onChange={(e) => setFormData({...formData, email: e.target.value})}
-                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                            className={`w-full p-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none ${stepError && step === 1 && /email/i.test(stepError) ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-600'}`}
                             required
                           />
+                          {stepError && step === 1 && /email/i.test(stepError) && (
+                            <div className="text-sm text-red-400 mt-1">Invalid email address</div>
+                          )}
                         </div>
                         <div>
                           <label className="text-sm text-gray-300 block mb-1">Phone Number <span className="text-red-400">*</span></label>
@@ -346,9 +390,12 @@ export default function HackathonRegister() {
                             placeholder="Phone Number"
                             value={formData.phone}
                             onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                            className={`w-full p-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none ${stepError && step === 1 && /phone/i.test(stepError) ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-600'}`}
                             required
                           />
+                          {stepError && step === 1 && /phone/i.test(stepError) && (
+                            <div className="text-sm text-red-400 mt-1">Invalid phone number (10 digits expected)</div>
+                          )}
                         </div>
                       </div>
                     </>
@@ -413,9 +460,12 @@ export default function HackathonRegister() {
                             newMembers[index] = { ...member, email: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          className={`w-full p-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none ${memberErrors[index] && memberErrors[index].includes('Email') ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-600'}`}
                           required={index < 3}
                         />
+                        {memberErrors[index] && memberErrors[index].includes('Email') && (
+                          <div className="text-sm text-red-400 mt-1">Invalid or missing email for member {index+1}</div>
+                        )}
                         <input
                           type="tel"
                           placeholder="Phone Number"
@@ -425,25 +475,40 @@ export default function HackathonRegister() {
                             newMembers[index] = { ...member, phone: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          className={`w-full p-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none ${memberErrors[index] && memberErrors[index].includes('Phone') ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-600'}`}
                           required={index < 3}
                         />
-                        <select
-                          value={member.semester || ''}
-                          onChange={(e) => {
-                            const newMembers = [...formData.members]
-                            newMembers[index] = { ...member, semester: e.target.value }
-                            setFormData({...formData, members: newMembers})
-                          }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
-                          required={index < 3}
-                        >
-                          <option value="">Select Semester</option>
-                          <option value="1st">1st</option>
-                          <option value="3rd">3rd</option>
-                          <option value="5th">5th</option>
-                          <option value="7th">7th</option>
-                        </select>
+                        {memberErrors[index] && memberErrors[index].includes('Phone') && (
+                          <div className="text-sm text-red-400 mt-1">Invalid or missing phone for member {index+1}</div>
+                        )}
+                        {/* Semester choices as checkbox-style (select at least one) */}
+                        <div className={`mb-2 ${memberErrors[index] && memberErrors[index].includes('Semester') ? 'ring-1 ring-red-500 rounded-md' : ''}`}>
+                          <div className="text-sm text-gray-400 mb-2">Select semester (choose the semester this member is currently in)</div>
+                          <div className="flex flex-wrap gap-2">
+                          {['1st', '3rd', '5th', '7th'].map((opt) => {
+                            const checked = Array.isArray(member.semester) && member.semester.includes(opt)
+                            return (
+                              <label key={opt} className={`inline-flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer ${checked ? 'bg-gray-700 border border-gray-600' : 'bg-gray-800/30 border border-gray-700'}`}>
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={checked}
+                                  onChange={() => {
+                                    const newMembers = [...formData.members]
+                                    const curr = Array.isArray(member.semester) ? [...member.semester] : []
+                                    const idxIn = curr.indexOf(opt)
+                                    if (idxIn > -1) curr.splice(idxIn, 1)
+                                    else curr.push(opt)
+                                    newMembers[index] = { ...member, semester: curr }
+                                    setFormData({ ...formData, members: newMembers })
+                                  }}
+                                />
+                                <span className="text-sm text-gray-200">{opt}</span>
+                              </label>
+                            )
+                          })}
+                          </div>
+                        </div>
                         <input
                           type="text"
                           placeholder="Section (e.g., A)"
@@ -453,35 +518,68 @@ export default function HackathonRegister() {
                             newMembers[index] = { ...member, section: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          className={`w-full p-3 bg-gray-800 border rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none ${memberErrors[index] && memberErrors[index].includes('Section') ? 'border-red-500 ring-1 ring-red-500' : 'border-gray-600'}`}
                           required={index < 3}
                         />
+                        {memberErrors[index] && memberErrors[index].includes('Section') && (
+                          <div className="text-sm text-red-400 mt-1">Section is required for member {index+1}</div>
+                        )}
                         {/* Additional fields: Department & Hostelite/Day Scholar */}
-                        <input
-                          type="text"
-                          placeholder="Department (CSE/AIML/ECE/Mech)"
-                          value={(member as any).department || ''}
-                          onChange={(e) => {
-                            const newMembers = [...formData.members]
-                            newMembers[index] = { ...(member as any), department: e.target.value }
-                            setFormData({...formData, members: newMembers})
-                          }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 3}
-                        />
+                        {/* Department as checkbox options (choose at least one) */}
+                        <div className={`mb-2 ${memberErrors[index] && memberErrors[index].includes('Department') ? 'ring-1 ring-red-500 rounded-md' : ''}`}>
+                          <div className="text-sm text-gray-400 mb-2">Select department(s) — used to route mentors and resources</div>
+                          <div className="flex flex-wrap gap-2">
+                          {['CSE', 'AIML', 'ECE', 'Mech', 'EEE'].map((opt) => {
+                            const checked = Array.isArray((member as any).department) && (member as any).department.includes(opt)
+                            return (
+                              <label key={opt} className={`inline-flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer ${checked ? 'bg-gray-700 border border-gray-600' : 'bg-gray-800/30 border border-gray-700'}`}>
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={checked}
+                                  onChange={() => {
+                                    const newMembers = [...formData.members]
+                                    const curr = Array.isArray((member as any).department) ? [...(member as any).department] : []
+                                    const idxIn = curr.indexOf(opt)
+                                    if (idxIn > -1) curr.splice(idxIn, 1)
+                                    else curr.push(opt)
+                                    newMembers[index] = { ...(member as any), department: curr }
+                                    setFormData({ ...formData, members: newMembers })
+                                  }}
+                                />
+                                <span className="text-sm text-gray-200">{opt}</span>
+                              </label>
+                            )
+                          })}
+                          </div>
+                        </div>
 
-                        <input
-                          type="text"
-                          placeholder="Hostelite / Day Scholar"
-                          value={(member as any).hostel || ''}
-                          onChange={(e) => {
-                            const newMembers = [...formData.members]
-                            newMembers[index] = { ...(member as any), hostel: e.target.value }
-                            setFormData({...formData, members: newMembers})
-                          }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 3}
-                        />
+                        {/* Hostelite / Day Scholar as radio-style choices */}
+                        <div className={`mb-2 ${memberErrors[index] && memberErrors[index].includes('Hostel') ? 'ring-1 ring-red-500 rounded-md' : ''}`}>
+                          <div className="text-sm text-gray-400 mb-2">Select whether this member is a hostelite or a day scholar</div>
+                          <div className="flex flex-wrap gap-2">
+                          {['Hostelite', 'Day Scholar'].map((opt) => {
+                            const checked = Array.isArray((member as any).hostel) && (member as any).hostel.includes(opt)
+                            return (
+                              <label key={opt} className={`inline-flex items-center gap-2 px-3 py-2 rounded-md cursor-pointer ${checked ? 'bg-gray-700 border border-gray-600' : 'bg-gray-800/30 border border-gray-700'}`}>
+                                <input
+                                  type="checkbox"
+                                  className="hidden"
+                                  checked={checked}
+                                  onChange={() => {
+                                    const newMembers = [...formData.members]
+                                    // store single choice as array with one element for compatibility
+                                    const curr = checked ? [] : [opt]
+                                    newMembers[index] = { ...(member as any), hostel: curr }
+                                    setFormData({ ...formData, members: newMembers })
+                                  }}
+                                />
+                                <span className="text-sm text-gray-200">{opt}</span>
+                              </label>
+                            )
+                          })}
+                          </div>
+                        </div>
                         
                         {/* Payment acknowledgement upload */}
                         <div className="col-span-1 md:col-span-2 mt-2">
@@ -512,6 +610,9 @@ export default function HackathonRegister() {
                           {member.paymentName && (
                             <div className="mt-2 text-xs text-gray-400">Selected: {member.paymentName}</div>
                           )}
+                          {memberErrors[index] && (
+                            <div className="mt-2 text-sm text-red-400">{memberErrors[index]}</div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -536,7 +637,7 @@ export default function HackathonRegister() {
                         <div className="text-white font-medium">{member.name} {index === 0 ? '(Leader)' : ''}</div>
                         <div className="text-gray-400 text-sm">
                           SRN: {member.srn} | Email: {member.email} | Phone: {member.phone} | 
-                          Sem: {member.semester} | Sec: {member.section}
+                          Sem: {Array.isArray(member.semester) ? member.semester.join(', ') : member.semester} | Sec: {member.section}
                         </div>
                       </div>
                     ))}
@@ -624,11 +725,11 @@ export default function HackathonRegister() {
                             email: '',
                             phone: '',
                             members: [
-                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' },
-                              { name: '', srn: '', email: '', phone: '', semester: '', section: '' }
-                            ],
+                                { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+                                { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+                                { name: '', srn: '', email: '', phone: '', semester: [], section: '' },
+                                { name: '', srn: '', email: '', phone: '', semester: [], section: '' }
+                              ],
                             campus: '',
                             proposalPdf: null,
                           })
@@ -660,7 +761,7 @@ export default function HackathonRegister() {
                   
                   <button
                     onClick={step === 3 ? handleSubmit : handleNext}
-                    disabled={!isStepValid() || (step === 3 && submitting)}
+                    disabled={(step === 3 && submitting)}
                     className="px-6 py-3 bg-gradient-orange text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                   >
                     {step === 3 ? (submitting ? 'Submitting…' : 'Submit') : 'Next'}
