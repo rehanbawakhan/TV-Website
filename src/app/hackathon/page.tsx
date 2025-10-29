@@ -62,22 +62,39 @@ export default function HackathonRegister() {
   
   const isStepValid = () => {
     switch (step) {
-      case 1:
-        return formData.teamName.trim() && formData.teamLeader.trim() && formData.email.trim() && formData.phone.trim()
-      case 2:
-        // Require at least 2 members with complete details (name, srn, email, phone, semester, section)
-        // Additionally require payment acknowledgements for the first 2 members always,
-        // and for member 3 & 4 only if those members exist (name provided).
+      case 1: {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const phoneRegex = /^\d{10}$/
+        return (
+          !!formData.teamName.trim() &&
+          !!formData.teamLeader.trim() &&
+          !!formData.email.trim() &&
+          emailRegex.test(formData.email) &&
+          !!formData.phone.trim() &&
+          phoneRegex.test(formData.phone)
+        )
+      }
+      case 2: {
+        // Require at least 3 members with complete details (name, srn, email, phone, semester, section)
+        // Additionally require payment acknowledgements for the first 3 members always,
+        // and for member 4 only if that member exists (name provided).
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        const phoneRegex = /^\d{10}$/
         const completeMembers = formData.members.filter(member => (
-          member.name && member.name.trim() && member.srn && member.srn.trim() && member.email && member.email.trim() && member.phone && member.phone.trim() && member.semester && member.semester.trim() && member.section && member.section.trim()
+          member.name && member.name.trim() &&
+          member.srn && member.srn.trim() &&
+          member.email && member.email.trim() && emailRegex.test(member.email) &&
+          member.phone && member.phone.trim() && phoneRegex.test(member.phone) &&
+          member.semester && member.semester.trim() &&
+          member.section && member.section.trim()
         ))
 
-        // Payment checks
-        // First two members must have payments. For the remaining members, require payment only if the member exists (name provided).
-        const paymentsOk = formData.members.slice(0, 2).every((m) => !!m.paymentDataUrl) &&
-          formData.members.slice(2).every((m) => !m.name || !!m.paymentDataUrl)
+        // Payment checks: first three must have payments (since min team size 3). Fourth required only if present.
+        const paymentsOk = formData.members.slice(0, 3).every((m) => !!m.paymentDataUrl) &&
+          formData.members.slice(3).every((m) => !m.name || !!m.paymentDataUrl)
 
-        return completeMembers.length >= 2 && paymentsOk
+        return completeMembers.length >= 3 && paymentsOk
+      }
       case 3:
         // final review step - no additional required fields
         return true
@@ -214,7 +231,7 @@ export default function HackathonRegister() {
             {step === 1 && (
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Hackathon Registration Details</h2>
-                <div className="space-y-4">
+                      <div className="space-y-4">
                   {formSchema && Array.isArray(formSchema.fields) ? (
                     (() => {
                       const fields = formSchema.fields as any[]
@@ -277,21 +294,29 @@ export default function HackathonRegister() {
                     })()
                   ) : (
                     <>
-                      <input
-                        type="text"
-                        placeholder="Team Name"
-                        value={formData.teamName}
-                        onChange={(e) => setFormData({...formData, teamName: e.target.value})}
-                        className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                      />
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-sm text-gray-300 block mb-1">Team Name <span className="text-red-400">*</span></label>
                         <input
                           type="text"
-                          placeholder="Team Leader Name"
-                          value={formData.teamLeader}
-                          onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
+                          placeholder="Team Name"
+                          value={formData.teamName}
+                          onChange={(e) => setFormData({...formData, teamName: e.target.value})}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          required
                         />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-sm text-gray-300 block mb-1">Team Leader Name <span className="text-red-400">*</span></label>
+                          <input
+                            type="text"
+                            placeholder="Team Leader Name"
+                            value={formData.teamLeader}
+                            onChange={(e) => setFormData({...formData, teamLeader: e.target.value})}
+                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                            required
+                          />
+                        </div>
                         <select
                           value={formData['campus'] || ''}
                           onChange={(e) => setFormData({...formData, campus: e.target.value})}
@@ -303,20 +328,28 @@ export default function HackathonRegister() {
                         </select>
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input
-                          type="email"
-                          placeholder="Email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({...formData, email: e.target.value})}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                        />
-                        <input
-                          type="tel"
-                          placeholder="Phone Number"
-                          value={formData.phone}
-                          onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                        />
+                        <div>
+                          <label className="text-sm text-gray-300 block mb-1">Email <span className="text-red-400">*</span></label>
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="text-sm text-gray-300 block mb-1">Phone Number <span className="text-red-400">*</span></label>
+                          <input
+                            type="tel"
+                            placeholder="Phone Number"
+                            value={formData.phone}
+                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                            className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                            required
+                          />
+                        </div>
                       </div>
                     </>
                   )}
@@ -336,15 +369,15 @@ export default function HackathonRegister() {
                     <img src="/images/Payment3.png" alt="Payment example 3" className="w-full rounded-lg border border-gray-700" />
                   </div>
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-6">Member Details (Min 2 — Max 4)</h2>
+                <h2 className="text-2xl font-bold text-white mb-6">Member Details (Team size: 3-4)</h2>
                 <p className="text-gray-400 text-sm mb-6">
-                  🏁 Provide details for each team member. Minimum 2 members required (including team leader). Up to 4 members allowed.
+                  🏁 Provide details for each team member. Minimum 3 members required (including team leader). Up to 4 members allowed.
                 </p>
                 <div className="space-y-6">
                   {formData.members.map((member, index) => (
                     <div key={index} className="bg-gray-800/30 p-4 rounded-lg border border-gray-700">
                       <h3 className="text-white font-semibold mb-4">
-                        Member {index + 1} {index === 0 ? '(Team Leader)' : (index < 2 ? '(Required)' : '(Optional)')}
+                        Member {index + 1} {index === 0 ? '(Team Leader)' : (index < 3 ? '(Required)' : '(Optional)')} {index < 3 && <span className="text-red-400">*</span>}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
@@ -357,7 +390,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 3}
                         />
                         <input
                           type="text"
@@ -369,7 +402,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 2}
+                          required={index < 3}
                         />
                         <input
                           type="email"
@@ -381,7 +414,7 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index === 0}
+                          required={index < 3}
                         />
                         <input
                           type="tel"
@@ -393,20 +426,24 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 2}
+                          required={index < 3}
                         />
-                        <input
-                          type="text"
-                          placeholder="Semester (e.g., 5)"
-                          value={member.semester}
+                        <select
+                          value={member.semester || ''}
                           onChange={(e) => {
                             const newMembers = [...formData.members]
                             newMembers[index] = { ...member, semester: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 2}
-                        />
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
+                          required={index < 3}
+                        >
+                          <option value="">Select Semester</option>
+                          <option value="1st">1st</option>
+                          <option value="3rd">3rd</option>
+                          <option value="5th">5th</option>
+                          <option value="7th">7th</option>
+                        </select>
                         <input
                           type="text"
                           placeholder="Section (e.g., A)"
@@ -417,42 +454,38 @@ export default function HackathonRegister() {
                             setFormData({...formData, members: newMembers})
                           }}
                           className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
-                          required={index < 2}
+                          required={index < 3}
                         />
                         {/* Additional fields: Department & Hostelite/Day Scholar */}
-                        <select
+                        <input
+                          type="text"
+                          placeholder="Department (CSE/AIML/ECE/Mech)"
                           value={(member as any).department || ''}
                           onChange={(e) => {
                             const newMembers = [...formData.members]
                             newMembers[index] = { ...(member as any), department: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
-                        >
-                          <option value="">Department (CSE/AIML/ECE/Mech)</option>
-                          <option value="CSE">CSE</option>
-                          <option value="AIML">AIML</option>
-                          <option value="ECE">ECE</option>
-                          <option value="Mech">Mech</option>
-                        </select>
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          required={index < 3}
+                        />
 
-                        <select
+                        <input
+                          type="text"
+                          placeholder="Hostelite / Day Scholar"
                           value={(member as any).hostel || ''}
                           onChange={(e) => {
                             const newMembers = [...formData.members]
                             newMembers[index] = { ...(member as any), hostel: e.target.value }
                             setFormData({...formData, members: newMembers})
                           }}
-                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white"
-                        >
-                          <option value="">Hostelite / Day Scholar</option>
-                          <option value="Hostelite">Hostelite</option>
-                          <option value="Day Scholar">Day Scholar</option>
-                        </select>
+                          className="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-orange-500 focus:outline-none"
+                          required={index < 3}
+                        />
                         
                         {/* Payment acknowledgement upload */}
                         <div className="col-span-1 md:col-span-2 mt-2">
-                          <label className="block text-sm text-gray-300 mb-2">Payment acknowledgement {index < 2 ? <span className="text-red-400">(required)</span> : <span className="text-gray-400">(required if member exists)</span>}</label>
+                          <label className="block text-sm text-gray-300 mb-2">Payment acknowledgement {index < 3 ? <span className="text-red-400">(required)</span> : <span className="text-gray-400">(required if member exists)</span>}</label>
                           <input
                             type="file"
                             accept="image/*,application/pdf"
