@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       campus,
       members,
       proposalPdf,
+      // members may include a "payment" object: { name, data } (data = dataURL/base64)
     } = body
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
       return publicUrl
     }
 
-    // Upload files if provided
+    // Upload files if provided (proposal and per-member payments)
     let proposalUrl: string | null = null
     let detailsUrl: string | null = null
     let paymentUrl: string | null = null
@@ -68,7 +69,24 @@ export async function POST(req: Request) {
       if (proposalPdf) {
         proposalUrl = await uploadBase64('hackathon', `${teamName}_proposal`, proposalPdf)
       }
-      // payment screenshot handling removed (client no longer sends this)
+      // Upload member payment acknowledgements (if present)
+      if (Array.isArray(members)) {
+        for (let i = 0; i < members.length; i++) {
+          const m = members[i] as any
+          if (!m) continue
+          // client sends payment as { name, data }
+          const paymentObj = (m.payment as any) || (m.paymentDataUrl ? { name: m.paymentName || `payment_${i+1}`, data: m.paymentDataUrl } : null)
+          if (paymentObj && paymentObj.data) {
+            try {
+              const uploaded = await uploadBase64('hackathon', `${teamName}_payment_member${i+1}`, paymentObj)
+              // attach public URL back to the member object for DB storage
+              m.payment_url = uploaded
+            } catch (e) {
+              console.warn(`Failed to upload payment for member ${i+1}:`, e)
+            }
+          }
+        }
+      }
     } catch (err) {
       console.error('Upload error:', err)
       return NextResponse.json({ error: 'File upload failed' }, { status: 500 })
@@ -81,6 +99,7 @@ export async function POST(req: Request) {
       leader_email: email,
       leader_phone: phone,
       campus: campus || null,
+      // store members including any payment_url fields added above
       members: members || [],
       proposal_pdf_url: proposalUrl,
     }

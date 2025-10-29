@@ -214,11 +214,11 @@ export default function GuidelinesPage() {
             animate={headerInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            {[
-              { label: 'Duration', value: '18h', icon: '⏰' },
-              { label: 'Prize Pool', value: '₹35K+', icon: '💰' },
-              { label: 'Date', value: '7th Nov', icon: '📅' }
-            ].map((stat, index) => (
+              {[
+                { label: 'Duration', value: '18h', icon: '⏰' },
+                { label: 'Prize Pool', value: '₹35K+', icon: '💰' },
+                { label: 'Date', value: '7th Nov', icon: '📅' }
+              ].map((stat, index) => (
               <motion.div
                 key={stat.label}
                 className="text-center group"
@@ -241,17 +241,6 @@ export default function GuidelinesPage() {
                 >
                   {stat.icon}
                 </motion.div>
-              {/* WhatsApp group link (below icons) */}
-              <div className="mt-8">
-                <a
-                  href="https://chat.whatsapp.com/FTCvjQ1Z6TVKD75GrVHEJe?mode=wwt"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md"
-                >
-                  🔗 Join the WhatsApp group for updates
-                </a>
-              </div>
                 <div className="text-2xl font-bold text-blue-500 group-hover:text-blue-400 transition-colors">
                   {stat.value}
                 </div>
@@ -259,6 +248,18 @@ export default function GuidelinesPage() {
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Single WhatsApp CTA below the stat cards (responsive) */}
+          <div className="mt-8 flex justify-center">
+            <a
+              href="https://chat.whatsapp.com/FTCvjQ1Z6TVKD75GrVHEJe?mode=wwt"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto max-w-lg px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-md text-center"
+            >
+              🔗 Join the WhatsApp group for updates
+            </a>
+          </div>
         </div>
       </section>
 

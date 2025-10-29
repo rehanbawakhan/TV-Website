@@ -81,6 +81,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Ensure proper scaling on mobile devices */}
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       {/* suppressHydrationWarning prevents React from logging mismatches caused by browser extensions or client-only injected attributes (e.g. Grammarly) */}
       <body suppressHydrationWarning className={inter.className}>
         <ClientRoot>

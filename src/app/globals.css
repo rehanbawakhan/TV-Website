@@ -148,3 +148,39 @@ a {
 .orange-glow:hover {
   box-shadow: 0 0 36px 0 rgba(255, 107, 53, 0.55), 0 0 12px 0 #FF6B35;
 }
+
+/* Responsive media rules: prevents overflow and ensures images/videos scale on small screens */
+img, picture, video, svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Make form controls and buttons easier to tap on mobile */
+button, input, select, textarea {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  font-size: 1rem; /* baseline comfortable size */
+}
+
+/* Larger default touch target for buttons without changing Tailwind classes */
+button {
+  min-height: 44px; /* recommended touch target */
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Utility class for responsive images used in components */
+.responsive-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Slightly increase spacing for small screens to avoid cramped layouts */
+@media (max-width: 640px) {
+  html, body {
+    font-size: 15px;
+  }
+  .h-16 { height: 4rem; }
+}

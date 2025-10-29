@@ -15,6 +15,9 @@ interface Member {
   section: string
   department?: string
   hostel?: string
+  // Payment upload preview/holder (client only) - serialized to { name, data } (data is dataURL) when sending
+  paymentName?: string
+  paymentDataUrl?: string
 }
 
 interface FormData {
@@ -63,10 +66,18 @@ export default function HackathonRegister() {
         return formData.teamName.trim() && formData.teamLeader.trim() && formData.email.trim() && formData.phone.trim()
       case 2:
         // Require at least 2 members with complete details (name, srn, email, phone, semester, section)
-        const validCount = formData.members.filter(member => (
-          member.name.trim() && member.srn.trim() && member.email.trim() && member.phone.trim() && member.semester.trim() && member.section.trim()
-        )).length
-        return validCount >= 2
+        // Additionally require payment acknowledgements for the first 2 members always,
+        // and for member 3 & 4 only if those members exist (name provided).
+        const completeMembers = formData.members.filter(member => (
+          member.name && member.name.trim() && member.srn && member.srn.trim() && member.email && member.email.trim() && member.phone && member.phone.trim() && member.semester && member.semester.trim() && member.section && member.section.trim()
+        ))
+
+        // Payment checks
+        // First two members must have payments. For the remaining members, require payment only if the member exists (name provided).
+        const paymentsOk = formData.members.slice(0, 2).every((m) => !!m.paymentDataUrl) &&
+          formData.members.slice(2).every((m) => !m.name || !!m.paymentDataUrl)
+
+        return completeMembers.length >= 2 && paymentsOk
       case 3:
         // final review step - no additional required fields
         return true
@@ -315,6 +326,16 @@ export default function HackathonRegister() {
 
             {step === 2 && (
               <div>
+                {/* Payment example images - show how to pay before member details */}
+                <div className="mb-6">
+                  <h3 className="text-white font-semibold mb-3">Payment instructions</h3>
+                  <p className="text-gray-400 text-sm mb-3">Please take a screenshot of your payment/acknowledgement. Upload each member's payment below. Example screenshots:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <img src="/images/Payment1.png" alt="Payment example 1" className="w-full rounded-lg border border-gray-700" />
+                    <img src="/images/Payment2.png" alt="Payment example 2" className="w-full rounded-lg border border-gray-700" />
+                    <img src="/images/Payment3.png" alt="Payment example 3" className="w-full rounded-lg border border-gray-700" />
+                  </div>
+                </div>
                 <h2 className="text-2xl font-bold text-white mb-6">Member Details (Min 2 — Max 4)</h2>
                 <p className="text-gray-400 text-sm mb-6">
                   🏁 Provide details for each team member. Minimum 2 members required (including team leader). Up to 4 members allowed.
@@ -428,12 +449,44 @@ export default function HackathonRegister() {
                           <option value="Hostelite">Hostelite</option>
                           <option value="Day Scholar">Day Scholar</option>
                         </select>
+                        
+                        {/* Payment acknowledgement upload */}
+                        <div className="col-span-1 md:col-span-2 mt-2">
+                          <label className="block text-sm text-gray-300 mb-2">Payment acknowledgement {index < 2 ? <span className="text-red-400">(required)</span> : <span className="text-gray-400">(required if member exists)</span>}</label>
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0]
+                              const newMembers = [...formData.members]
+                              if (!file) {
+                                newMembers[index] = { ...member, paymentName: undefined, paymentDataUrl: undefined }
+                                setFormData({...formData, members: newMembers})
+                                return
+                              }
+
+                              // Read file as data URL for upload
+                              const reader = new FileReader()
+                              reader.onload = () => {
+                                const dataUrl = reader.result as string
+                                newMembers[index] = { ...member, paymentName: file.name, paymentDataUrl: dataUrl }
+                                setFormData({...formData, members: newMembers})
+                              }
+                              reader.readAsDataURL(file)
+                            }}
+                            className="w-full text-sm text-gray-300"
+                          />
+                          {member.paymentName && (
+                            <div className="mt-2 text-xs text-gray-400">Selected: {member.paymentName}</div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
 
             {step === 3 && (
               <div>
@@ -505,10 +558,7 @@ export default function HackathonRegister() {
                   ) : (
                     <div className="mt-6">
                       <div className="p-6 rounded-lg bg-gray-900/40 border border-gray-700 text-center">
-                        <p className="text-red-400 text-lg font-semibold" style={{ textShadow: '0 0 8px rgba(220,38,38,0.6)' }}>
-                          Payments will begin on friday and subsequent form will be shared in the Whatsapp Group
-                        </p>
-                        <p className="mt-3 text-xs text-gray-400">Please join the WhatsApp group for payment details and follow-up forms.</p>
+                        <p className="mt-3 text-xs text-gray-400">Join the WhatsApp group for updates and queries.</p>
                       </div>
                     </div>
                   )}
