@@ -34,7 +34,11 @@ interface FormData {
 
 export default function HackathonRegister() {
   const router = useRouter()
+  // Registrations are force-closed for Ignition. Set to `false` to re-open or
+  // switch to an env flag `NEXT_PUBLIC_REGISTRATIONS_CLOSED` if you prefer toggling without code changes.
+  const registrationsClosed = true
   const [step, setStep] = useState(1)
+  const [countdown, setCountdown] = useState(5)
   const [formSchema, setFormSchema] = useState<any | null>(null)
   const [proposalError, setProposalError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -210,55 +214,46 @@ export default function HackathonRegister() {
     return () => { mounted = false }
   }, [])
 
+  // Countdown + redirect when registrations are closed
+  useEffect(() => {
+    if (!registrationsClosed) return
+    setCountdown(5)
+    const id = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(id)
+          router.push('/')
+          return 0
+        }
+        return c - 1
+      })
+    }, 1000)
+    return () => clearInterval(id)
+  }, [registrationsClosed, router])
+
   // No payment flow for Ignition registrations — final step is a plain confirmation.
-
-  return (
-    <div className="min-h-screen bg-gradient-black">
-      <Navigation />
-      
-      <div className="pt-24 pb-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <motion.div
-            className="text-center mb-12"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-4 modern-title">
-              <span className="text-transparent bg-clip-text bg-gradient-orange">
-                Ignition 1.0
-              </span>{' '}
-              Registration
-            </h1>
-            <p className="text-gray-400 text-lg modern-body">
-              Register your team for Ignition 1.0 — bring your proposed solutions and race to build the best project.
-            </p>
-          </motion.div>
-
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
-              {[1, 2, 3].map((num) => (
-                <div
-                  key={num}
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold modern-body
-                    ${step >= num ? 'bg-primary-orange text-white' : 'bg-gray-700 text-gray-400'}`}
-                >
-                  {num}
-                </div>
-              ))}
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <motion.div
-                className="bg-gradient-orange h-2 rounded-full"
-                animate={{ width: `${(step / 3) * 100}%` }}
-                transition={{ duration: 0.3 }}
-              />
-            </div>
+  // If registrations are closed, show the countdown + redirect page (do not render the form)
+  if (registrationsClosed) {
+    return (
+      <div className="min-h-screen bg-gradient-black flex items-center justify-center p-6">
+        <div className="max-w-2xl w-full text-center">
+          <Navigation />
+          <div className="mt-12 bg-gray-900/80 border border-gray-700 p-10 rounded-lg">
+            <h1 className="text-5xl font-bold text-white mb-4">Registrations are Closed</h1>
+            <p className="text-gray-400 mb-6">We are no longer accepting registrations for Ignition 1.0.</p>
+            <p className="text-gray-300 mb-2">Redirecting to the homepage in <span className="font-semibold text-white">{countdown}</span> second{countdown === 1 ? '' : 's'}…</p>
+            <p className="text-sm text-gray-500">If you are not redirected automatically, <a href="/" className="text-orange-400 underline">click here</a>.</p>
           </div>
-
-          {/* Form Steps */}
+        </div>
+      </div>
+    )
+  }
+      return (
+        <div className="min-h-screen bg-gradient-black">
+          <Navigation />
+      
+          <div className="pt-24 pb-12 px-4">
+            <div className="max-w-4xl mx-auto">
           <motion.div
             className="bg-gradient-to-br from-gray-900/50 to-gray-800/50 p-8 rounded-xl border border-gray-700/50 backdrop-blur-sm"
             key={step}
@@ -761,7 +756,7 @@ export default function HackathonRegister() {
                   
                   <button
                     onClick={step === 3 ? handleSubmit : handleNext}
-                    disabled={(step === 3 && submitting)}
+                    disabled={registrationsClosed || (step === 3 && submitting)}
                     className="px-6 py-3 bg-gradient-orange text-white rounded-lg hover:shadow-lg hover:shadow-orange-500/25 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none"
                   >
                     {step === 3 ? (submitting ? 'Submitting…' : 'Submit') : 'Next'}

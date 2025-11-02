@@ -36,6 +36,7 @@ import IMG_Ankit from '@/lib/crewimg/Ankit Bembalgi.jpg'
 import IMG_Vinay from '@/lib/crewimg/Vinay Dasari.jpg'
 import IMG_Swetha from '@/lib/crewimg/Swetha.png'
 import IMG_Ram from '@/lib/crewimg/Ram Prakhyath.png'
+import IMG_Bhumika from '@/lib/crewimg/Bhumika.jpg'
 
 const domainColors = {
   Automotive: 'from-orange-500 to-red-600',
@@ -81,6 +82,7 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Vinay Dasari': IMG_Vinay,
   'Swetha Ranganathan': IMG_Swetha,
   'Ram Prakhyath': IMG_Ram,
+  'Bhumika': IMG_Bhumika,
 }
 
 // Map normalized filenames (lowercased) to imported assets
@@ -115,6 +117,7 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'vinay dasari.jpg': IMG_Vinay,
   'swetha.png': IMG_Swetha,
   'ram prakhyath.png': IMG_Ram,
+  'bhumika.jpg': IMG_Bhumika,
 }
 
 function resolveMemberImage(member: TeamMember): StaticImageData | string {
@@ -152,7 +155,7 @@ export default function CrewPage() {
 
   // Segregation logic (updated to match supabase.ts fallback data)
   const coreMembers = teamMembers.filter(m => 
-    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core' || m.role === 'Club Manager' || m.role === 'Social Media Head' || m.role === 'Automotive Head'
+    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core' || m.role === 'Club Manager' || m.role === 'Social Media Head' || m.role === 'Automotive Head' || m.role === 'Operations Head'
   )
   const crewMembers = teamMembers.filter(m => m.role === 'Member')
   const newRecruits = teamMembers.filter(m => m.role === 'New Recruit')

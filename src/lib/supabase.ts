@@ -122,6 +122,15 @@ export async function getTeamMembers() {
         photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
+      {
+        id: 'core-6',
+        name: 'Bhumika',
+        role: 'Operations Head',
+        domain: 'Operations',
+        bio: "Still pretending to know what I'm doing 😥",
+        photo_url: getCrewImagePath('Bhumika.jpg'),
+        created_at: new Date().toISOString(),
+      },
       // Crew
       {
         id: 'crew-1',
