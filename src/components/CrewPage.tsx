@@ -37,6 +37,13 @@ import IMG_Vinay from '@/lib/crewimg/Vinay Dasari.jpg'
 import IMG_Swetha from '@/lib/crewimg/Swetha.png'
 import IMG_Ram from '@/lib/crewimg/Ram Prakhyath.png'
 import IMG_Bhumika from '@/lib/crewimg/Bhumika.jpg'
+import IMG_Alan from '@/lib/crewimg/Alan.jpeg'
+import IMG_Anantha from '@/lib/crewimg/Anantha.jpeg'
+import IMG_Harshith from '@/lib/crewimg/Harshith.jpg'
+import IMG_Karthik from '@/lib/crewimg/Karthik.jpg'
+import IMG_Mancirat from '@/lib/crewimg/Mancirat.jpeg'
+import IMG_VinaySimple from '@/lib/crewimg/Vinay.jpg'
+import IMG_Kethan from '@/lib/crewimg/kethan.jpg'
 
 const domainColors = {
   Automotive: 'from-orange-500 to-red-600',
@@ -80,6 +87,13 @@ const crewImages: Record<string, StaticImageData | string> = {
   'Sharanya': IMG_Sharanya,
   'Ankit Bembalgi': IMG_Ankit,
   'Vinay Dasari': IMG_Vinay,
+  'Vinay': IMG_VinaySimple,
+  'Alan G Lal': IMG_Alan,
+  'Anantha Krishnan': IMG_Anantha,
+  'HARSHITH R': IMG_Harshith,
+  'Karthik': IMG_Karthik,
+  'Mancirat Singh': IMG_Mancirat,
+  'Kethan K B': IMG_Kethan,
   'Swetha Ranganathan': IMG_Swetha,
   'Ram Prakhyath': IMG_Ram,
   'Bhumika': IMG_Bhumika,
@@ -115,6 +129,13 @@ const crewAssetByFile: Record<string, StaticImageData> = {
   'manish.png': IMG_Manish,
   'ankit bembalgi.jpg': IMG_Ankit,
   'vinay dasari.jpg': IMG_Vinay,
+  'vinay.jpg': IMG_VinaySimple,
+  'alan.jpeg': IMG_Alan,
+  'anantha.jpeg': IMG_Anantha,
+  'harshith.jpg': IMG_Harshith,
+  'karthik.jpg': IMG_Karthik,
+  'mancirat.jpeg': IMG_Mancirat,
+  'kethan.jpg': IMG_Kethan,
   'swetha.png': IMG_Swetha,
   'ram prakhyath.png': IMG_Ram,
   'bhumika.jpg': IMG_Bhumika,
@@ -165,7 +186,7 @@ export default function CrewPage() {
     'Operations Head'
   ]
 
-  const oldCrewRoles = ['Club Head 25', 'Old Crew']
+  const oldCrewRoles = ['Club Head 25', 'Old Crew', 'Core 2019 - 2023', 'Head of Go-karting', "Core’25", 'Core 21-23']
 
   const coreMembers = teamMembers.filter(m => coreRoles.includes(m.role))
   // Treat as crew any member who is not core, not a legacy entry, and not a new recruit
