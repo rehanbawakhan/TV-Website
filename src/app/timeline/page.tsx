@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Hidden timeline page — racing themed. Reachable by typing /timeline
@@ -90,6 +90,8 @@ export default function TimelinePage() {
   const [now, setNow] = useState<Date>(new Date())
   const [lightsOn, setLightsOn] = useState(false)
   const [lightSequenceIndex, setLightSequenceIndex] = useState(-1)
+  const confettiRef = useRef<HTMLCanvasElement | null>(null)
+  const carRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 500)
@@ -147,12 +149,86 @@ export default function TimelinePage() {
   useEffect(() => {
     if (currentIndex >= 0 && !playedMilestones[currentIndex]) {
       setPlayedMilestones((p) => ({ ...p, [currentIndex]: true }))
+      // trigger confetti on milestone
+      triggerConfetti()
     }
   }, [currentIndex, playedMilestones])
 
+  // --- Confetti (lightweight canvas particles) ---
+  type Particle = { x: number; y: number; vx: number; vy: number; size: number; color: string; ttl: number }
+
+  const makeParticle = (w: number, h: number): Particle => {
+    const angle = Math.random() * Math.PI - Math.PI / 2
+    const speed = 2 + Math.random() * 4
+    return {
+      x: Math.random() * w,
+      y: Math.random() * (h * 0.5),
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      size: 4 + Math.random() * 6,
+      color: ['#FF4D4F', '#FF7A59', '#FFF166', '#8AFFC1'][Math.floor(Math.random() * 4)],
+      ttl: 60 + Math.floor(Math.random() * 60)
+    }
+  }
+
+  const triggerConfetti = (count = 70) => {
+    const canvas = confettiRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const particles: Particle[] = []
+    const w = canvas.width
+    const h = canvas.height
+    for (let i = 0; i < count; i++) particles.push(makeParticle(w, h))
+
+    let raf = 0
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h)
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i]
+        p.x += p.vx
+        p.y += p.vy
+        p.vy += 0.12 // gravity
+        p.ttl -= 1
+        ctx.fillStyle = p.color
+        ctx.beginPath()
+        ctx.ellipse(p.x, p.y, p.size, p.size * 0.7, 0, 0, Math.PI * 2)
+        ctx.fill()
+        if (p.ttl <= 0 || p.y > h + 20) particles.splice(i, 1)
+      }
+      if (particles.length > 0) raf = requestAnimationFrame(draw)
+    }
+
+    cancelAnimationFrame(raf)
+    draw()
+    setTimeout(() => cancelAnimationFrame(raf), 4000)
+  }
+
+  useEffect(() => {
+    const canvas = confettiRef.current
+    if (!canvas) return
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect()
+      const ratio = window.devicePixelRatio || 1
+      canvas.width = Math.max(300, Math.floor(rect.width * ratio))
+      canvas.height = Math.max(150, Math.floor(rect.height * ratio))
+      const ctx = canvas.getContext('2d')
+      if (ctx) ctx.scale(ratio, ratio)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    return () => window.removeEventListener('resize', resize)
+  }, [])
+
+  // --- Car position helper ---
+  const carLeftPercent = Math.min(100, Math.max(0, progress))
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-6">
-      <div className="max-w-6xl mx-auto">
+  <div className="max-w-6xl mx-auto relative">
+        {/* confetti canvas sits on top and is pointer-events-none */}
+        <canvas ref={confettiRef} className="pointer-events-none absolute left-0 right-0 mx-auto top-6 max-w-6xl w-full" style={{ height: 160 }} />
         <h1 className="text-4xl font-extrabold mb-2">Ignition Timeline — Race Day</h1>
         <p className="text-gray-400 mb-6">Hidden page — type <span className="font-mono">/timeline</span> to open. Timeline starts on <strong>7 Nov 2025</strong>.</p>
 
@@ -204,6 +280,22 @@ export default function TimelinePage() {
         {/* Timeline bar with markers */}
         <div className="bg-gray-900 p-4 rounded-lg mb-8">
           <div className="relative h-6 w-full bg-gray-800 rounded-full overflow-hidden">
+            {/* moving car icon */}
+            <motion.div
+              ref={carRef}
+              className="absolute -top-6 w-10 h-10 rounded-md flex items-center justify-center"
+              style={{ left: `${carLeftPercent}%`, transform: 'translateX(-50%)' }}
+              animate={{ left: `${carLeftPercent}%` }}
+              transition={{ type: 'spring', stiffness: 90, damping: 18 }}
+            >
+              {/* simple car SVG */}
+              <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="8" width="36" height="8" rx="2" fill="#FF4D4F" />
+                <rect x="6" y="4" width="20" height="8" rx="2" fill="#FF7A59" />
+                <circle cx="10" cy="18" r="3" fill="#111827" />
+                <circle cx="30" cy="18" r="3" fill="#111827" />
+              </svg>
+            </motion.div>
             {/* filled progress */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="h-6 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-300" style={{ width: `${progress}%`, transition: 'width 0.6s linear' }} />
@@ -239,9 +331,26 @@ export default function TimelinePage() {
                   className={`p-3 rounded-lg border ${isCurrent ? 'border-yellow-400 bg-yellow-900/10' : 'border-gray-700'} ${reached ? 'shadow-glow' : ''}`}
                 >
                   <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-sm font-semibold">{ev.label}</div>
-                      <div className="text-xs text-gray-400">{ev.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {ev.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div className="flex items-center space-x-3">
+                      <div>
+                        <div className="text-sm font-semibold">{ev.label}</div>
+                        <div className="text-xs text-gray-400">{ev.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {ev.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                      </div>
+                      {/* pitstop animation indicator */}
+                      {/pit/i.test(ev.label) && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={reached ? { opacity: 1, scale: [1, 1.06, 1] } : { opacity: 0.6 }}
+                          transition={{ duration: 0.9, repeat: reached ? Infinity : 0, repeatType: 'reverse' }}
+                          className="flex items-center space-x-1 text-xs text-orange-300"
+                        >
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.7 6.3l3 3L9 18.999 6 16 14.7 6.3z" fill="#FFB020" />
+                            <path d="M3 21h18v2H3z" fill="#FF7A59" />
+                          </svg>
+                          <div>Pit Stop</div>
+                        </motion.div>
+                      )}
                     </div>
                     <div className="text-xs text-gray-400">{durationMinutes} min</div>
                   </div>
@@ -251,9 +360,9 @@ export default function TimelinePage() {
                       <motion.div
                         key="pulse"
                         initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: 1, scale: 1.02 }}
+                        animate={{ opacity: [1, 1.02, 1] }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.6, yoyo: Infinity }}
+                        transition={{ duration: 0.9, repeat: Infinity, repeatType: 'reverse' }}
                         className="mt-2 text-xs text-green-300"
                       >
                         Live now

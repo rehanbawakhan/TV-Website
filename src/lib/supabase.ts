@@ -294,6 +294,34 @@ export async function getTeamMembers() {
         photo_url: getCrewImagePath('Vinay Dasari.jpg'),
         created_at: new Date().toISOString(),
       },
+      // Additional crew requested
+      {
+        id: 'crew-21',
+        name: 'Kethan K B',
+        role: 'Robotics',
+        domain: 'Robotics',
+        bio: 'NTG much',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-22',
+        name: 'Sumedh B Rao',
+        role: 'Member',
+        domain: 'Automotive',
+        bio: "Best club in pesecc!! ,  dont care what anyone says .",
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'crew-23',
+        name: 'Mancirat Singh',
+        role: 'Automotives',
+        domain: 'Automotive',
+        bio: 'In mad love with cars and engines...',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
       // New Recruits
       // Add new recruits here
       // Old Crew
@@ -332,6 +360,43 @@ export async function getTeamMembers() {
         domain: 'Automotive',
         bio: 'Grazie Ragazzi',
         photo_url: getCrewImagePath('Ram Prakhyath.png'),
+        created_at: new Date().toISOString(),
+      },
+      // More legacy members requested
+      {
+        id: 'oc-5',
+        name: 'HARSHITH R',
+        role: 'Old Crew',
+        domain: 'Automotive',
+        bio: 'Core 2019 - 2023 — #LifeatFullThrottle',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-6',
+        name: 'Alan G Lal',
+        role: 'Old Crew',
+        domain: 'Automotive',
+        bio: 'Head of Go-karting — For me, racing isn’t about the track. It’s about the team that builds the machine',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-7',
+        name: 'Anantha Krishnan',
+        role: 'Old Crew',
+        domain: 'Automotive',
+        bio: "Core’25 — Life’s too short for Slow Laps",
+        photo_url: '/assets/team/placeholder-avatar.jpg',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'oc-8',
+        name: 'Karthik',
+        role: 'Old Crew',
+        domain: 'Automotive',
+        bio: 'Core 21-23 — Art without Engineering is dreaming, Engineering without Art is calculating.',
+        photo_url: '/assets/team/placeholder-avatar.jpg',
         created_at: new Date().toISOString(),
       },
 // Crew image tile size recommendation: 1:1 aspect ratio, e.g. 600x600px or 800x800px for best fit in the UI.

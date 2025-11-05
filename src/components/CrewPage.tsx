@@ -153,13 +153,25 @@ export default function CrewPage() {
     fetchTeamMembers()
   }, [])
 
-  // Segregation logic (updated to match supabase.ts fallback data)
-  const coreMembers = teamMembers.filter(m => 
-    m.role === 'Club Head' || m.role === 'Design Head' || m.role === 'Legacy Core' || m.role === 'Club Manager' || m.role === 'Social Media Head' || m.role === 'Automotive Head' || m.role === 'Operations Head'
-  )
-  const crewMembers = teamMembers.filter(m => m.role === 'Member')
+  // Segregation logic: keep a controlled list of core roles; everything else (except legacy/new recruits)
+  // will be presented under Crew so custom titles (e.g. 'Robotics', 'Automotives') show up as tiles.
+  const coreRoles = [
+    'Club Head',
+    'Design Head',
+    'Legacy Core',
+    'Club Manager',
+    'Social Media Head',
+    'Automotive Head',
+    'Operations Head'
+  ]
+
+  const oldCrewRoles = ['Club Head 25', 'Old Crew']
+
+  const coreMembers = teamMembers.filter(m => coreRoles.includes(m.role))
+  // Treat as crew any member who is not core, not a legacy entry, and not a new recruit
+  const crewMembers = teamMembers.filter(m => !coreRoles.includes(m.role) && !oldCrewRoles.includes(m.role) && m.role !== 'New Recruit')
   const newRecruits = teamMembers.filter(m => m.role === 'New Recruit')
-  const oldCrew = teamMembers.filter(m => m.role === 'Club Head 25' || m.role === 'Old Crew')
+  const oldCrew = teamMembers.filter(m => oldCrewRoles.includes(m.role))
 
   if (loading) {
     return (
