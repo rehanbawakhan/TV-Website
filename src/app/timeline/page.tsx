@@ -18,13 +18,13 @@ const RAW_EVENTS: EventItem[] = [
   { label: 'Sprint One', start: '7:30', end: '8:30' },
   { label: 'Pit Stop (Dinner)', start: '8:30', end: '9:30' },
   { label: 'Sprint Two', start: '9:30', end: '11:30' },
-  { label: 'Mini Games + Pizza', start: '11:30', end: '12:30' },
+  { label: 'Pitstop Two (Games+Pizza)', start: '11:30', end: '12:30' },
   { label: 'Sprint Three', start: '12:30', end: '14:30' },
   { label: 'Jam Session', start: '14:30', end: '15:00' },
   { label: 'Final Sprint', start: '15:00', end: '18:30' },
   { label: 'Shortlisting Round', start: '18:30', end: '19:30' },
   { label: 'Move to Quadrangle', start: '19:30', end: '20:00' },
-  { label: 'Breakfast', start: '20:00', end: '21:00' },
+  { label: 'Final Pitstop (Breakfast)', start: '20:00', end: '21:00' },
   { label: 'Judging', start: '21:00', end: '22:00' },
   { label: 'Prize and Felicitation', start: '22:00', end: '22:30' }
 ]
@@ -118,23 +118,33 @@ export default function TimelinePage() {
 
   // Countdown to start or to next milestone
   const timeToStartMs = Math.max(0, overallStart.getTime() - now.getTime())
+  // Hackathon official end: next day at 10:30 AM (explicit)
+  const hackathonEnd = new Date(overallStart.getTime())
+  hackathonEnd.setDate(hackathonEnd.getDate() + 1)
+  hackathonEnd.setHours(10, 30, 0, 0)
 
-  // F1 lights sequence controller
+  // F1 lights sequence controller: begin sequence when within 10s of start
   useEffect(() => {
-    // when within 7 seconds of start, begin sequence
-    if (timeToStartMs > 0 && timeToStartMs <= 7000) {
-      const seqInterval = setInterval(() => {
-        setLightSequenceIndex((idx) => Math.min(4, idx + 1))
-      }, 600)
-      setLightSequenceIndex(Math.max(0, Math.floor((7000 - timeToStartMs) / 600) - 1))
-      return () => clearInterval(seqInterval)
+    const SEQ_THRESHOLD = 10000 // 10 seconds
+    const LIGHT_COUNT = 5
+    let seqInterval: number | undefined
+
+    if (timeToStartMs > 0 && timeToStartMs <= SEQ_THRESHOLD) {
+      // reset
+      setLightSequenceIndex(-1)
+      // light up one at a time every 800ms
+      seqInterval = window.setInterval(() => {
+        setLightSequenceIndex((idx) => Math.min(LIGHT_COUNT - 1, idx + 1))
+      }, 800)
+      return () => { if (seqInterval) clearInterval(seqInterval) }
     }
 
     if (timeToStartMs === 0) {
-      // start — show green
+      // start — show green and ensure all lights lit
       setLightsOn(true)
-      setLightSequenceIndex(4)
+      setLightSequenceIndex(LIGHT_COUNT - 1)
     }
+    return () => { if (seqInterval) clearInterval(seqInterval) }
   }, [timeToStartMs])
 
   // Reset lights after start
@@ -161,8 +171,8 @@ export default function TimelinePage() {
     const angle = Math.random() * Math.PI - Math.PI / 2
     const speed = 2 + Math.random() * 4
     return {
-      x: Math.random() * w,
-      y: Math.random() * (h * 0.5),
+      x: w / 2 + (Math.random() - 0.5) * 200,
+      y: h / 2 + (Math.random() - 0.5) * 50,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed - 2,
       size: 4 + Math.random() * 6,
@@ -225,15 +235,25 @@ export default function TimelinePage() {
   const carLeftPercent = Math.min(100, Math.max(0, progress))
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-6">
-  <div className="max-w-6xl mx-auto relative">
+    <div className="h-screen w-screen overflow-hidden bg-gradient-to-b from-gray-900 via-black to-gray-900 text-white p-6 flex items-center justify-center relative">
+      {/* Enhanced animated background */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(255,255,255,0.02),_transparent_40%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,10,15,0.6),rgba(3,7,17,0.9))]" />
+        <div className="absolute inset-0 opacity-20 bg-[repeating-linear-gradient(45deg,rgba(255,255,255,0.02),rgba(255,255,255,0.02) 12px,transparent 12px,transparent 24px)] animate-bg-pan" />
+        {/* subtle car silhouette */}
+        <svg className="absolute right-0 bottom-0 w-1/2 opacity-6 transform translate-x-24 translate-y-24" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 250 C150 120 300 120 420 180 C520 220 680 200 750 150 L740 260 L60 260 Z" fill="#ffffff" />
+        </svg>
+      </div>
+
+      <div className="w-full h-full relative max-w-6xl mx-auto">
         {/* confetti canvas sits on top and is pointer-events-none */}
         <canvas ref={confettiRef} className="pointer-events-none absolute left-0 right-0 mx-auto top-6 max-w-6xl w-full" style={{ height: 160 }} />
         <h1 className="text-4xl font-extrabold mb-2">Ignition Timeline — Race Day</h1>
-        <p className="text-gray-400 mb-6">Hidden page — type <span className="font-mono">/timeline</span> to open. Timeline starts on <strong>7 Nov 2025</strong>.</p>
 
-        {/* Top: Lights + Countdown */}
-        <div className="flex flex-col md:flex-row items-center md:items-end justify-between space-y-6 md:space-y-0 md:space-x-6 mb-8">
+  {/* Top: Lights + Countdown */}
+  <div className="flex flex-col md:flex-row items-center md:items-end justify-between space-y-6 md:space-y-0 md:space-x-6 mb-8">
           <div className="flex items-center space-x-6">
             <div className="bg-gray-800 p-4 rounded-lg shadow-lg flex flex-col items-center">
               <div className="mb-3 text-sm text-gray-300">Race Start Lights</div>
@@ -250,28 +270,53 @@ export default function TimelinePage() {
 
             <div className="bg-gray-800 p-4 rounded-lg shadow-lg w-64 text-center">
               <div className="text-xs text-gray-400">Countdown</div>
-              <div className="text-2xl font-mono mt-1">
-                {now.getTime() < overallStart.getTime()
-                  ? formatRemaining(overallStart.getTime() - now.getTime())
-                  : formatRemaining(overallEnd.getTime() - now.getTime())}
+                  <div className="text-2xl font-mono mt-1">
+                    {now.getTime() < overallStart.getTime()
+                      ? formatRemaining(overallStart.getTime() - now.getTime())
+                      : formatRemaining(hackathonEnd.getTime() - now.getTime())}
               </div>
-              <div className="text-sm text-gray-400 mt-1">
-                {now.getTime() < overallStart.getTime() ? 'to race start' : 'to day end'}
+                  <div className="text-sm text-gray-400 mt-1">
+                    {now.getTime() < overallStart.getTime() ? 'to race start' : 'Hackathon ends in'}
               </div>
             </div>
           </div>
 
           <div className="flex-1">
-            <div className="bg-gray-800 p-4 rounded-lg">
-              <div className="text-sm text-gray-400 mb-2">Progress</div>
-              <div className="w-full bg-gray-700 h-4 rounded-full overflow-hidden">
+            <div className="bg-gray-900/40 p-4 rounded-lg relative overflow-hidden">
+              <div className="absolute inset-0 opacity-30 bg-[linear-gradient(90deg,#000000_0%,#0b1221_50%,#000000_100%)] -z-10" />
+              <div className="text-sm text-gray-400 mb-2">Race Progress</div>
+              {/* Racetrack */}
+              <div className="w-full h-16 bg-gradient-to-b from-gray-800 to-gray-900 rounded-full relative overflow-hidden border border-gray-700">
+                {/* track stripes */}
+                <div className="absolute inset-0 bg-[repeating-linear-gradient( -45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 10px, transparent 10px, transparent 20px )] animate-track" />
+                {/* filled track */}
+                <div className="absolute left-0 top-0 bottom-0 rounded-full overflow-hidden pointer-events-none">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-red-600 via-orange-500 to-yellow-300"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progress}%` }}
+                    transition={{ ease: 'linear', duration: 0.6 }}
+                    style={{ borderRadius: '9999px' }}
+                  />
+                </div>
+
+                {/* race car (emoji + svg) */}
                 <motion.div
-                  className="h-4 bg-gradient-to-r from-red-600 via-orange-400 to-yellow-300"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${progress}%` }}
-                  transition={{ ease: 'linear', duration: 0.6 }}
-                />
+                  className="absolute top-1/2 transform -translate-y-1/2 w-14 h-10 z-20 will-change-transform car-jiggle"
+                  animate={{ left: `calc(${progress}% - 28px)` }}
+                  transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+                >
+                  <div className="w-full h-full flex items-center justify-center text-2xl" style={{ transform: 'scaleX(-1)' }} aria-hidden="true">🏎️</div>
+                </motion.div>
+                {/* wind lines */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute left-0 top-1/3 w-full h-0.5 opacity-40">
+                    <div className="w-40 h-0.5 bg-white/8 rounded transform translate-x-0 animate-wind" />
+                    <div className="w-32 h-0.5 bg-white/6 rounded transform translate-x-20 animate-wind delay-200" />
+                  </div>
+                </div>
               </div>
+
               <div className="mt-2 text-xs text-gray-400">{progress.toFixed(1)}% complete</div>
             </div>
           </div>
@@ -299,6 +344,12 @@ export default function TimelinePage() {
             {/* filled progress */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="h-6 bg-gradient-to-r from-red-600 via-orange-500 to-yellow-300" style={{ width: `${progress}%`, transition: 'width 0.6s linear' }} />
+              {/* center dashed line to look like a road */}
+              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-center pointer-events-none">
+                <div className="w-full h-0.5 bg-transparent flex items-center justify-between px-6">
+                  <div className="h-0.5 w-full border-t-2 border-dashed border-white/10" />
+                </div>
+              </div>
             </div>
 
             {/* markers */}
@@ -314,13 +365,10 @@ export default function TimelinePage() {
             })}
           </div>
 
-          {/* labels below */}
+          {/* labels below (condensed) */}
           <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
             {events.map((ev, idx) => {
-              const total = overallEnd.getTime() - overallStart.getTime()
-              const pos = ((ev.start.getTime() - overallStart.getTime()) / total) * 100
               const durationMinutes = Math.round((ev.end.getTime() - ev.start.getTime()) / 60000)
-              const isCurrent = currentIndex === idx
               const reached = now.getTime() >= ev.start.getTime()
               return (
                 <motion.div
@@ -328,92 +376,58 @@ export default function TimelinePage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: idx * 0.02 }}
-                  className={`p-3 rounded-lg border ${isCurrent ? 'border-yellow-400 bg-yellow-900/10' : 'border-gray-700'} ${reached ? 'shadow-glow' : ''}`}
+                  className={`p-3 rounded-lg border border-gray-700 ${reached ? 'shadow-glow bg-gray-800/20' : ''}`}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                      <div>
-                        <div className="text-sm font-semibold">{ev.label}</div>
-                        <div className="text-xs text-gray-400">{ev.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {ev.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                      </div>
-                      {/* pitstop animation indicator */}
-                      {/pit/i.test(ev.label) && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.95 }}
-                          animate={reached ? { opacity: 1, scale: [1, 1.06, 1] } : { opacity: 0.6 }}
-                          transition={{ duration: 0.9, repeat: reached ? Infinity : 0, repeatType: 'reverse' }}
-                          className="flex items-center space-x-1 text-xs text-orange-300"
-                        >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M14.7 6.3l3 3L9 18.999 6 16 14.7 6.3z" fill="#FFB020" />
-                            <path d="M3 21h18v2H3z" fill="#FF7A59" />
-                          </svg>
-                          <div>Pit Stop</div>
-                        </motion.div>
-                      )}
+                    <div>
+                      <div className="text-sm font-semibold">{ev.label}</div>
+                      <div className="text-xs text-gray-400">{ev.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     </div>
                     <div className="text-xs text-gray-400">{durationMinutes} min</div>
                   </div>
-
-                  <AnimatePresence>
-                    {isCurrent && (
-                      <motion.div
-                        key="pulse"
-                        initial={{ opacity: 0, scale: 0.98 }}
-                        animate={{ opacity: [1, 1.02, 1] }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.9, repeat: Infinity, repeatType: 'reverse' }}
-                        className="mt-2 text-xs text-green-300"
-                      >
-                        Live now
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </motion.div>
               )
             })}
           </div>
         </div>
 
-        {/* Current event / Next event summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-bold">Now</h3>
-            {currentIndex >= 0 ? (
-              <div className="mt-2">
-                <div className="text-xl font-semibold">{events[currentIndex].label}</div>
-                <div className="text-sm text-gray-400">{events[currentIndex].start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {events[currentIndex].end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                <div className="mt-2 text-xs text-gray-300">Time left: {formatRemaining(events[currentIndex].end.getTime() - now.getTime())}</div>
-              </div>
-            ) : (
-              <div className="mt-2 text-gray-400">Race will start at {overallStart.toLocaleString()}</div>
-            )}
-          </div>
-
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <h3 className="text-lg font-bold">Upcoming</h3>
-            <div className="mt-2 space-y-2">
-              {events.slice(currentIndex + 1, currentIndex + 4).map((e, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div>
-                    <div className="text-sm font-medium">{e.label}</div>
-                    <div className="text-xs text-gray-400">{e.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                  </div>
-                  <div className="text-xs text-gray-400">Starts in {formatRemaining(e.start.getTime() - now.getTime())}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Removed Now / Upcoming and footer per request - keep a full-screen, focused timeline */}
         </div>
 
-        <div className="mt-8 text-sm text-gray-500">Tip: This page is hidden on the site navigation. Share the URL directly when you want attendees to see the live timeline.</div>
+        <style jsx>{`
+          .shadow-glow {
+            box-shadow: 0 6px 24px rgba(250, 204, 21, 0.08), 0 2px 6px rgba(250, 204, 21, 0.04);
+          }
+          .car-jiggle {
+            animation: jiggle 0.28s ease-in-out infinite;
+          }
+          @keyframes jiggle {
+            0% { transform: translateY(-50%) translateX(0) rotate(-0.6deg); }
+            50% { transform: translateY(-48%) translateX(0) rotate(0.6deg); }
+            100% { transform: translateY(-50%) translateX(0) rotate(-0.6deg); }
+          }
+          .animate-wind {
+            animation: wind 1.2s linear infinite;
+          }
+          @keyframes wind {
+            from { transform: translateX(0); opacity: 0.25 }
+            to { transform: translateX(120%); opacity: 0 }
+          }
+          @keyframes trackPan {
+            from { background-position: 0 0; }
+            to { background-position: 200px 200px; }
+          }
+          .animate-track {
+            animation: trackPan 6s linear infinite;
+          }
+          @keyframes bgPan {
+            from { transform: translateX(0); }
+            to { transform: translateX(-60px); }
+          }
+          .animate-bg-pan {
+            animation: bgPan 10s linear infinite;
+          }
+        `}</style>
       </div>
-
-      <style jsx>{`
-        .shadow-glow {
-          box-shadow: 0 6px 24px rgba(250, 204, 21, 0.08), 0 2px 6px rgba(250, 204, 21, 0.04);
-        }
-      `}</style>
-    </div>
   )
 }
