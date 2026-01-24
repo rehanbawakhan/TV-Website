@@ -1,4 +1,5 @@
 import GalleryPage from '@/components/GalleryPage'
+import SiteMaintenanceClient from '@/components/SiteMaintenanceClient'
 
 export const metadata = {
   title: 'Gallery - Vegavath Technical Club',
@@ -6,5 +7,10 @@ export const metadata = {
 }
 
 export default function Gallery() {
-  return <GalleryPage />
+  return (
+    <>
+      <SiteMaintenanceClient page="gallery" />
+      <GalleryPage />
+    </>
+  )
 }
