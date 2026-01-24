@@ -22,7 +22,7 @@ export interface GalleryItem {
   id: string
   image_url: string
   caption: string
-  category: 'event' | 'project' | 'workshop' | 'general'
+  event_name: string
   created_at: string
 }
 
@@ -421,21 +421,97 @@ export async function getGalleryItems() {
   } catch (error) {
     // Return placeholder data if Supabase is not configured
     return [
+      // January 2026
       {
         id: '1',
-        image_url: '/assets/gallery/placeholder-1.jpg',
+        image_url: '/assets/gallery/placeholder-1.svg',
         caption: 'Team working on the latest automotive project',
-        category: 'project' as const,
-        created_at: new Date().toISOString(),
+        event_name: 'Ignition',
+        created_at: new Date(2026, 0, 24).toISOString(),
       },
       {
         id: '2',
-        image_url: '/assets/gallery/placeholder-2.jpg',
+        image_url: '/assets/gallery/placeholder-2.svg',
         caption: 'Robotics workshop with participants',
-        category: 'workshop' as const,
-        created_at: new Date().toISOString(),
+        event_name: 'Bootstrap',
+        created_at: new Date(2026, 0, 15).toISOString(),
+      },
+      // February 2026
+      {
+        id: 'feb-1',
+        image_url: '/assets/gallery/placeholder-3.svg',
+        caption: 'Technical workshop session',
+        event_name: 'Bootstrap',
+        created_at: new Date(2026, 1, 20).toISOString(),
+      },
+      {
+        id: 'feb-2',
+        image_url: '/assets/gallery/placeholder-4.svg',
+        caption: 'Team brainstorming session',
+        event_name: 'Design Workshop',
+        created_at: new Date(2026, 1, 15).toISOString(),
+      },
+      // March 2026 - Added by user
+      {
+        id: 'march-1',
+        image_url: '/assets/gallery/placeholder-march.svg',
+        caption: 'Team collaboration during March event',
+        event_name: 'March Workshop',
+        created_at: new Date(2026, 2, 20).toISOString(),
+      },
+      {
+        id: 'march-2',
+        image_url: '/assets/gallery/placeholder-2.svg',
+        caption: 'Project showcase presentation',
+        event_name: 'March Showcase',
+        created_at: new Date(2026, 2, 15).toISOString(),
+      },
+      // December 2025
+      {
+        id: '3',
+        image_url: '/assets/gallery/placeholder-3.svg',
+        caption: 'Annual tech fest event',
+        event_name: 'Ignition',
+        created_at: new Date(2025, 11, 20).toISOString(),
+      },
+      {
+        id: '4',
+        image_url: '/assets/gallery/placeholder-4.svg',
+        caption: 'Club team collaboration session',
+        event_name: 'Design Meeting',
+        created_at: new Date(2025, 11, 10).toISOString(),
       },
     ] as GalleryItem[]
+  }
+}
+
+export async function uploadGalleryImage(
+  file: File,
+  caption: string,
+  event_name: string
+) {
+  try {
+    // Upload image to storage
+    const fileName = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+    const imageUrl = await uploadFileToStorage('gallery', fileName, file)
+
+    // Add entry to gallery table
+    const { data, error } = await supabase
+      .from('gallery')
+      .insert([
+        {
+          image_url: imageUrl,
+          caption,
+          event_name,
+          created_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+
+    if (error) throw error
+    return data[0] as GalleryItem
+  } catch (error) {
+    throw error
   }
 }
 
