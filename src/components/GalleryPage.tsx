@@ -27,6 +27,7 @@ export default function GalleryPage() {
   const [loading, setLoading] = useState(false)
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
   const [groupedByMonth, setGroupedByMonth] = useState<MonthData[]>([])
+  const [filter, setFilter] = useState<string>('All')
 
   const [headerRef, headerInView] = useInView({
     triggerOnce: true,
@@ -100,33 +101,92 @@ export default function GalleryPage() {
         console.error('Error fetching gallery items:', error)
         // Use placeholder data if Supabase is not configured
         const placeholderItems: GalleryItem[] = [
+          // January 2026 - 4 items
           {
             id: '1',
-            image_url: '/assets/gallery/placeholder-1.svg',
+            image_url: '/assets/gallery/placeholder-1.jpg',
             caption: 'Team working on the latest automotive project',
             event_name: 'Ignition',
-            created_at: new Date(2024, 11, 15).toISOString(), // December 2024
+            created_at: new Date(2026, 0, 15).toISOString(),
           },
           {
             id: '2',
             image_url: '/assets/gallery/placeholder-2.svg',
             caption: 'Robotics workshop with participants',
             event_name: 'Bootstrap',
-            created_at: new Date(2024, 11, 10).toISOString(), // December 2024
+            created_at: new Date(2026, 0, 12).toISOString(),
           },
           {
             id: '3',
             image_url: '/assets/gallery/placeholder-3.svg',
             caption: 'Annual tech fest event',
             event_name: 'Ignition',
-            created_at: new Date(2024, 10, 20).toISOString(), // November 2024
+            created_at: new Date(2026, 0, 18).toISOString(),
           },
           {
             id: '4',
             image_url: '/assets/gallery/placeholder-4.svg',
             caption: 'Club team collaboration session',
             event_name: 'Ignition 2',
-            created_at: new Date(2024, 10, 5).toISOString(), // November 2024
+            created_at: new Date(2026, 0, 22).toISOString(),
+          },
+          // December 2025 - 4 items
+          {
+            id: '5',
+            image_url: '/assets/gallery/placeholder-1.jpg',
+            caption: 'Coding challenge finals',
+            event_name: 'Bootstrap',
+            created_at: new Date(2025, 11, 10).toISOString(),
+          },
+          {
+            id: '6',
+            image_url: '/assets/gallery/placeholder-2.svg',
+            caption: 'Hardware demonstration session',
+            event_name: 'Ignition',
+            created_at: new Date(2025, 11, 15).toISOString(),
+          },
+          {
+            id: '7',
+            image_url: '/assets/gallery/placeholder-3.svg',
+            caption: 'Networking event with industry experts',
+            event_name: 'Bootstrap',
+            created_at: new Date(2025, 11, 20).toISOString(),
+          },
+          {
+            id: '8',
+            image_url: '/assets/gallery/placeholder-4.svg',
+            caption: 'Project showcase presentation',
+            event_name: 'Ignition 2',
+            created_at: new Date(2025, 11, 25).toISOString(),
+          },
+          // November 2025 - 4 items
+          {
+            id: '9',
+            image_url: '/assets/gallery/placeholder-1.jpg',
+            caption: 'Workshop attendees learning new skills',
+            event_name: 'Ignition',
+            created_at: new Date(2025, 10, 8).toISOString(),
+          },
+          {
+            id: '10',
+            image_url: '/assets/gallery/placeholder-2.svg',
+            caption: 'Team building activity',
+            event_name: 'Bootstrap',
+            created_at: new Date(2025, 10, 14).toISOString(),
+          },
+          {
+            id: '11',
+            image_url: '/assets/gallery/placeholder-3.svg',
+            caption: 'Prize distribution ceremony',
+            event_name: 'Ignition',
+            created_at: new Date(2025, 10, 19).toISOString(),
+          },
+          {
+            id: '12',
+            image_url: '/assets/gallery/placeholder-4.svg',
+            caption: 'Student presentation on innovation',
+            event_name: 'Ignition 2',
+            created_at: new Date(2025, 10, 27).toISOString(),
           },
         ]
         setGalleryItems(placeholderItems)
@@ -139,8 +199,14 @@ export default function GalleryPage() {
     fetchGalleryItems()
   }, [])
 
-  const handleFilterChange = (filter: string) => {
-    // Filter functionality removed as we're now organizing by event name
+  const handleFilterChange = (filterName: string) => {
+    setFilter(filterName)
+    if (filterName === 'All') {
+      setGroupedByMonth(groupGalleryByMonthAndEvent(galleryItems))
+    } else {
+      const filtered = galleryItems.filter(item => item.event_name === filterName)
+      setGroupedByMonth(groupGalleryByMonthAndEvent(filtered))
+    }
   }
 
   const openLightbox = (item: GalleryItem) => {
@@ -240,6 +306,58 @@ export default function GalleryPage() {
         </div>
         
         <div className="max-w-6xl mx-auto relative z-10">
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-3 mb-12 justify-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleFilterChange('All')}
+              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${
+                filter === 'All'
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              All Events
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleFilterChange('Ignition')}
+              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${
+                filter === 'Ignition'
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Ignition
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleFilterChange('Bootstrap')}
+              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${
+                filter === 'Bootstrap'
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Bootstrap
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleFilterChange('Ignition 2')}
+              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${
+                filter === 'Ignition 2'
+                  ? 'bg-orange-500 text-white hover:bg-orange-600'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              Ignition 2
+            </motion.button>
+          </div>
+
           {galleryItems.length === 0 ? (
             <div className="text-center py-24">
               <motion.p
@@ -252,7 +370,7 @@ export default function GalleryPage() {
               </motion.p>
             </div>
           ) : (
-            <motion.div layout className="space-y-12">
+            <motion.div layout className="space-y-16">
               {groupedByMonth.map((monthData, monthIndex) => (
                 <motion.div
                   key={`${monthData.year}-${monthData.month}`}
@@ -262,7 +380,7 @@ export default function GalleryPage() {
                   className="space-y-6"
                 >
                   {/* Month Header */}
-                  <div className="relative flex items-center gap-4 mb-4">
+                  <div className="relative flex items-center gap-4 mb-8">
                     <h2 className="text-2xl md:text-3xl font-heading font-bold text-white whitespace-nowrap modern-title">
                       <span className="text-transparent bg-clip-text bg-gradient-orange">
                         {monthData.monthName}
@@ -273,55 +391,32 @@ export default function GalleryPage() {
                     </h2>
                   </div>
 
-                  {/* Events within Month */}
-                  <div className="space-y-6">
-                    {monthData.events.map((eventData, eventIndex) => (
+                  {/* Grid Layout - 4 items per month */}
+                  <motion.div 
+                    layout
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+                  >
+                    {monthData.events.flatMap(event => event.items).map((item, index) => (
                       <motion.div
-                        key={eventData.eventName}
+                        key={item.id}
+                        layout
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: monthIndex * 0.1 + eventIndex * 0.05 }}
-                        className="space-y-4"
+                        exit={{ opacity: 0, y: -30 }}
+                        transition={{ duration: 0.5, delay: index * 0.08 }}
+                        className="group cursor-pointer"
+                        onClick={() => openLightbox(item)}
                       >
-                        {/* Event Name Header */}
-                        <div className="flex items-center gap-3 mb-4">
-                          <h3 className="text-lg md:text-xl font-heading font-semibold text-orange-400">
-                            {eventData.eventName}
-                          </h3>
-                          <span className="text-sm text-gray-500">
-                            ({eventData.items.length} {eventData.items.length === 1 ? 'photo' : 'photos'})
-                          </span>
-                          <div className="flex-grow h-px bg-gradient-to-r from-orange-500/20 to-transparent"></div>
-                        </div>
-
-                        {/* Event Gallery Grid */}
-                        <motion.div 
-                          layout
-                          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-                        >
-                          {eventData.items.map((item, index) => (
-                            <motion.div
-                              key={item.id}
-                              layout
-                              initial={{ opacity: 0, y: 30 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              exit={{ opacity: 0, y: -30 }}
-                              transition={{ duration: 0.5, delay: index * 0.08 }}
-                              className="group cursor-pointer"
-                              onClick={() => openLightbox(item)}
-                            >
-                              <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:transform hover:scale-105">
-                                {/* Image */}
-                                <div className="relative h-64 bg-gray-800 overflow-hidden">
+                        <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all duration-300 hover:transform hover:scale-105">
+                          {/* Image */}
+                          <div className="relative w-full bg-gray-800 overflow-hidden flex items-center justify-center" style={{ paddingBottom: '56.25%' }}>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              {item.image_url ? (
+                                <>
                                   <img
-                                    src={item.image_url || `/assets/gallery/placeholder-${(index % 4) + 1}.svg`}
+                                    src={item.image_url}
                                     alt={item.caption || 'Gallery image'}
-                                    onError={(e) => {
-                                      const img = e.currentTarget as HTMLImageElement
-                                      img.onerror = null
-                                      img.src = `/assets/gallery/placeholder-${(index % 4) + 1}.svg`
-                                    }}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-contain"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10" />
 
@@ -337,26 +432,33 @@ export default function GalleryPage() {
                                       </svg>
                                     </div>
                                   </div>
+                                </>
+                              ) : (
+                                <div className="flex flex-col items-center justify-center w-full h-full bg-gradient-to-br from-gray-700 to-gray-900 hover:from-gray-600 hover:to-gray-800 transition-all duration-300">
+                                  <svg className="w-16 h-16 text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                                  </svg>
+                                  <p className="text-gray-300 text-sm font-medium">Upload Image</p>
                                 </div>
+                              )}
+                            </div>
+                          </div>
 
-                                {/* Caption */}
-                                <div className="p-4 bg-gray-900/80 backdrop-blur-sm border-t border-gray-700/50">
-                                  <p className="text-gray-200 text-sm leading-relaxed mb-2 font-medium">{item.caption}</p>
-                                  <p className="text-xs text-gray-500">
-                                    {new Date(item.created_at).toLocaleDateString('default', { 
-                                      year: 'numeric',
-                                      month: 'short',
-                                      day: 'numeric'
-                                    })}
-                                  </p>
-                                </div>
-                              </div>
-                            </motion.div>
-                          ))}
-                        </motion.div>
+                          {/* Caption */}
+                          <div className="p-4 bg-gray-900/80 backdrop-blur-sm border-t border-gray-700/50">
+                            <p className="text-gray-200 text-sm leading-relaxed mb-2 font-medium">{item.caption}</p>
+                            <p className="text-xs text-gray-500">
+                              {new Date(item.created_at).toLocaleDateString('default', { 
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+                        </div>
                       </motion.div>
                     ))}
-                  </div>
+                  </motion.div>
                 </motion.div>
               ))}
             </motion.div>
@@ -394,17 +496,21 @@ export default function GalleryPage() {
               </button>
 
               {/* Image */}
-              <div className="relative h-96 bg-gray-800">
-                <img
-                  src={selectedItem.image_url || '/assets/gallery/placeholder-1.svg'}
-                  alt={selectedItem.caption || 'Full resolution'}
-                  onError={(e) => {
-                    const img = e.currentTarget as HTMLImageElement
-                    img.onerror = null
-                    img.src = '/assets/gallery/placeholder-1.svg'
-                  }}
-                  className="w-full h-full object-contain"
-                />
+              <div className="relative h-96 bg-gray-800 flex items-center justify-center">
+                {selectedItem.image_url ? (
+                  <img
+                    src={selectedItem.image_url}
+                    alt={selectedItem.caption || 'Full resolution'}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center">
+                    <svg className="w-20 h-20 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                    <p className="text-gray-400 text-lg font-medium">Upload Image</p>
+                  </div>
+                )}
               </div>
 
               {/* Details */}
