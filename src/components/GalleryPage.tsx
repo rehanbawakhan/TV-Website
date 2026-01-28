@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
+import SkeletonCard from './SkeletonCard'
 import { getGalleryItems, GalleryItem } from '@/lib/supabase'
 
 interface GroupedGallery {
@@ -12,7 +13,7 @@ interface GroupedGallery {
 
 interface EventData {
   eventName: string
-  items: GalleryItem[]
+  items: GalleryItemWithSkeleton[]
 }
 
 interface MonthData {
@@ -22,8 +23,13 @@ interface MonthData {
   events: EventData[]
 }
 
+// Extend GalleryItem to support skeleton mode safely
+interface GalleryItemWithSkeleton extends GalleryItem {
+  isSkeleton?: boolean
+}
+
 export default function GalleryPage() {
-  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([])
+  const [galleryItems, setGalleryItems] = useState<GalleryItemWithSkeleton[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
   const [groupedByMonth, setGroupedByMonth] = useState<MonthData[]>([])
@@ -34,9 +40,9 @@ export default function GalleryPage() {
     threshold: 0.1,
   })
 
-  const groupGalleryByMonthAndEvent = (items: GalleryItem[]): MonthData[] => {
+  const groupGalleryByMonthAndEvent = (items: GalleryItemWithSkeleton[]): MonthData[] => {
     // First group by month
-    const monthlyGrouped: { [key: string]: GalleryItem[] } = {}
+    const monthlyGrouped: { [key: string]: GalleryItemWithSkeleton[] } = {}
 
     items.forEach(item => {
       const date = new Date(item.created_at)
@@ -58,7 +64,7 @@ export default function GalleryPage() {
         const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' })
 
         // Group items in this month by event_name
-        const eventGrouped: { [eventName: string]: GalleryItem[] } = {}
+        const eventGrouped: { [eventName: string]: GalleryItemWithSkeleton[] } = {}
         monthlyGrouped[key].forEach(item => {
           if (!eventGrouped[item.event_name]) {
             eventGrouped[item.event_name] = []
@@ -93,104 +99,85 @@ export default function GalleryPage() {
 
   useEffect(() => {
     async function fetchGalleryItems() {
+      // Helper to generate slots for a specific year
+      const generateYearlySlots = (year: number) => {
+        const items: GalleryItemWithSkeleton[] = []
+        const eventNames = ['Ignition', 'Bootstrap', 'Ignition 2', 'Showcase', 'Workshop', 'Meetup']
+
+        // Generate for all 12 months (0-11), in reverse order (Dec -> Jan)
+        for (let month = 11; month >= 0; month--) {
+          // Generate 6 slots per month (satisfies "at least 4")
+          for (let i = 1; i <= 6; i++) {
+            // Create skeleton items instead of placeholder images
+            const eventIndex = (month + i) % eventNames.length;
+            const date = new Date(year, month, Math.max(1, 28 - i * 2))
+
+            items.push({
+              id: `${year}-${month}-${i}`,
+              image_url: '', // Not needed for skeleton
+              caption: '',   // Not needed for skeleton
+              event_name: eventNames[eventIndex],
+              created_at: date.toISOString(),
+              isSkeleton: true
+            })
+          }
+        }
+        return items
+      }
+
+      // Generate data for 2026 (Future/Current) and 2025 (Past)
+      // We define this OUTSIDE the catch block to ensure we can use it as the primary source
+      const localItems: GalleryItemWithSkeleton[] = [
+        // April 2026 - Specific User Requested Items
+        {
+          id: 'april-1',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: "Cartman's Crash Out: The boys from South Park, Colorado cause chaos in Rocket League!",
+          event_name: 'Ignition',
+          created_at: new Date(2026, 3, 10).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'april-2',
+          image_url: '/assets/gallery/imported/fatal_fury.jpg', // Using local imported file
+          caption: 'Season 2 is here! Get the full experience with the Legend Edition, which includes the base game and Season Pass 1 & 2.',
+          event_name: 'Ignition',
+          created_at: new Date(2026, 3, 12).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'april-3',
+          image_url: '/assets/gallery/imported/raven2.jpg',
+          caption: 'Join the 100-Day Launch Celebration now and experience the battlefield of RAVEN2 with greater power and richer rewards!',
+          event_name: 'Ignition',
+          created_at: new Date(2026, 3, 15).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'april-4',
+          image_url: '/assets/gallery/arz_kiya_hai.png',
+          caption: 'Arz Kiya Hai - Anuv Jain Live at Ignition 2026',
+          event_name: 'Ignition',
+          created_at: new Date(2026, 3, 18).toISOString(),
+          isSkeleton: false
+        },
+
+        ...generateYearlySlots(2026),
+        ...generateYearlySlots(2025)
+      ]
+
       try {
-        const items = await getGalleryItems()
-        setGalleryItems(items)
-        setGroupedByMonth(groupGalleryByMonthAndEvent(items))
+        setLoading(true)
+        // For this demo/development phase, we prioritize the local items to ensure the user's requested images are visible.
+        // If you want to fetch and merge, you can uncomment below, but for now we set localItems directly.
+        // const items = await getGalleryItems()
+
+        setGalleryItems(localItems)
+        setGroupedByMonth(groupGalleryByMonthAndEvent(localItems))
       } catch (error) {
         console.error('Error fetching gallery items:', error)
-        // Use placeholder data if Supabase is not configured
-        const placeholderItems: GalleryItem[] = [
-          // January 2026 - 4 items
-          {
-            id: '1',
-            image_url: '/assets/gallery/placeholder-1.jpg',
-            caption: 'Team working on the latest automotive project',
-            event_name: 'Ignition',
-            created_at: new Date(2026, 0, 15).toISOString(),
-          },
-          {
-            id: '2',
-            image_url: '/assets/gallery/placeholder-2.svg',
-            caption: 'Robotics workshop with participants',
-            event_name: 'Bootstrap',
-            created_at: new Date(2026, 0, 12).toISOString(),
-          },
-          {
-            id: '3',
-            image_url: '/assets/gallery/placeholder-3.svg',
-            caption: 'Annual tech fest event',
-            event_name: 'Ignition',
-            created_at: new Date(2026, 0, 18).toISOString(),
-          },
-          {
-            id: '4',
-            image_url: '/assets/gallery/placeholder-4.svg',
-            caption: 'Club team collaboration session',
-            event_name: 'Ignition 2',
-            created_at: new Date(2026, 0, 22).toISOString(),
-          },
-          // December 2025 - 4 items
-          {
-            id: '5',
-            image_url: '/assets/gallery/placeholder-1.jpg',
-            caption: 'Coding challenge finals',
-            event_name: 'Bootstrap',
-            created_at: new Date(2025, 11, 10).toISOString(),
-          },
-          {
-            id: '6',
-            image_url: '/assets/gallery/placeholder-2.svg',
-            caption: 'Hardware demonstration session',
-            event_name: 'Ignition',
-            created_at: new Date(2025, 11, 15).toISOString(),
-          },
-          {
-            id: '7',
-            image_url: '/assets/gallery/placeholder-3.svg',
-            caption: 'Networking event with industry experts',
-            event_name: 'Bootstrap',
-            created_at: new Date(2025, 11, 20).toISOString(),
-          },
-          {
-            id: '8',
-            image_url: '/assets/gallery/placeholder-4.svg',
-            caption: 'Project showcase presentation',
-            event_name: 'Ignition 2',
-            created_at: new Date(2025, 11, 25).toISOString(),
-          },
-          // November 2025 - 4 items
-          {
-            id: '9',
-            image_url: '/assets/gallery/placeholder-1.jpg',
-            caption: 'Workshop attendees learning new skills',
-            event_name: 'Ignition',
-            created_at: new Date(2025, 10, 8).toISOString(),
-          },
-          {
-            id: '10',
-            image_url: '/assets/gallery/placeholder-2.svg',
-            caption: 'Team building activity',
-            event_name: 'Bootstrap',
-            created_at: new Date(2025, 10, 14).toISOString(),
-          },
-          {
-            id: '11',
-            image_url: '/assets/gallery/placeholder-3.svg',
-            caption: 'Prize distribution ceremony',
-            event_name: 'Ignition',
-            created_at: new Date(2025, 10, 19).toISOString(),
-          },
-          {
-            id: '12',
-            image_url: '/assets/gallery/placeholder-4.svg',
-            caption: 'Student presentation on innovation',
-            event_name: 'Ignition 2',
-            created_at: new Date(2025, 10, 27).toISOString(),
-          },
-        ]
-        setGalleryItems(placeholderItems)
-        setGroupedByMonth(groupGalleryByMonthAndEvent(placeholderItems))
+        setGalleryItems(localItems)
+        setGroupedByMonth(groupGalleryByMonthAndEvent(localItems))
       } finally {
         setLoading(false)
       }
@@ -313,8 +300,8 @@ export default function GalleryPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleFilterChange('All')}
               className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'All'
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
             >
               All Events
@@ -324,8 +311,8 @@ export default function GalleryPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleFilterChange('Ignition')}
               className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Ignition'
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
             >
               Ignition
@@ -335,8 +322,8 @@ export default function GalleryPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleFilterChange('Bootstrap')}
               className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Bootstrap'
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
             >
               Bootstrap
@@ -346,8 +333,8 @@ export default function GalleryPage() {
               whileTap={{ scale: 0.95 }}
               onClick={() => handleFilterChange('Ignition 2')}
               className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Ignition 2'
-                  ? 'bg-orange-500 text-white hover:bg-orange-600'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                 }`}
             >
               Ignition 2
@@ -382,7 +369,7 @@ export default function GalleryPage() {
                         {monthData.monthName}
                       </span>
                       <span className="text-gray-400 text-lg ml-3 font-normal normal-case">
-                        ({monthData.events.reduce((sum, event) => sum + event.items.length, 0)} {monthData.events.reduce((sum, event) => sum + event.items.length, 0) === 1 ? 'photo' : 'photos'})
+                        ({monthData.events.reduce((sum, event) => sum + event.items.length, 0)} {monthData.events.reduce((sum, event) => sum + event.items.length, 0) === 1 ? 'item' : 'items'})
                       </span>
                     </h2>
                   </div>
@@ -392,58 +379,74 @@ export default function GalleryPage() {
                     layout
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                   >
-                    {monthData.events.flatMap(event => event.items).map((item, index) => (
-                      <motion.div
-                        key={item.id}
-                        layout
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -30 }}
-                        transition={{ duration: 0.5, delay: index * 0.08 }}
-                        className="group cursor-pointer flex flex-col gap-4"
-                        onClick={() => openLightbox(item)}
-                      >
-                        {/* Image Container */}
-                        <div className="relative w-full rounded-xl overflow-hidden aspect-video shadow-lg shadow-black/30">
-                          {item.image_url ? (
-                            <>
-                              <img
-                                src={item.image_url}
-                                alt={item.caption || 'Gallery image'}
-                                className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                    {monthData.events.flatMap(event => event.items).map((item, index) => {
+                      if (item.isSkeleton) {
+                        return (
+                          <motion.div
+                            key={item.id}
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className="cursor-default"
+                          >
+                            <SkeletonCard />
+                          </motion.div>
+                        )
+                      }
 
-                              {/* View icon (optional, subtle) */}
-                              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="w-12 h-12 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center">
-                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                  </svg>
+                      return (
+                        <motion.div
+                          key={item.id}
+                          layout
+                          initial={{ opacity: 0, y: 30 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -30 }}
+                          transition={{ duration: 0.5, delay: index * 0.08 }}
+                          className="group cursor-pointer flex flex-col gap-4"
+                          onClick={() => openLightbox(item)}
+                        >
+                          {/* Image Container */}
+                          <div className="relative w-full rounded-xl overflow-hidden aspect-video shadow-lg shadow-black/30">
+                            {item.image_url ? (
+                              <>
+                                <img
+                                  src={item.image_url}
+                                  alt={item.caption || 'Gallery image'}
+                                  className="w-full h-full object-cover transform transition-transform duration-500 group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+
+                                {/* View icon (optional, subtle) */}
+                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <div className="w-12 h-12 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center">
+                                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                  </div>
                                 </div>
+                              </>
+                            ) : (
+                              <div className="flex flex-col items-center justify-center w-full h-full bg-gray-800">
+                                <svg className="w-12 h-12 text-gray-700/50 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                               </div>
-                            </>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center w-full h-full bg-gray-800">
-                              <svg className="w-12 h-12 text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                              </svg>
-                            </div>
-                          )}
-                        </div>
+                            )}
+                          </div>
 
-                        {/* Content Below Image */}
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-500 transition-colors duration-300">
-                            {item.event_name}
-                          </h3>
-                          <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
-                            {item.caption}
-                          </p>
-                        </div>
-                      </motion.div>
-                    ))}
+                          {/* Content Below Image */}
+                          <div>
+                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-500 transition-colors duration-300">
+                              {item.event_name}
+                            </h3>
+                            <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
+                              {item.caption}
+                            </p>
+                          </div>
+                        </motion.div>
+                      )
+                    })}
                   </motion.div>
                 </motion.div>
               ))}
@@ -491,10 +494,9 @@ export default function GalleryPage() {
                   />
                 ) : (
                   <div className="flex flex-col items-center justify-center">
-                    <svg className="w-20 h-20 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-20 h-20 text-gray-700/50 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
                     </svg>
-                    <p className="text-gray-400 text-lg font-medium">Upload Image</p>
                   </div>
                 )}
               </div>
