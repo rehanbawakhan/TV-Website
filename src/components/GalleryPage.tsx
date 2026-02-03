@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import Navigation from './Navigation'
 import SkeletonCard from './SkeletonCard'
-import { getGalleryItems, GalleryItem } from '@/lib/supabase'
+import { GalleryItem } from '@/lib/supabase'
 
 interface GroupedGallery {
   [key: string]: GalleryItem[]
@@ -14,13 +14,6 @@ interface GroupedGallery {
 interface EventData {
   eventName: string
   items: GalleryItemWithSkeleton[]
-}
-
-interface MonthData {
-  year: number
-  month: number
-  monthName: string
-  events: EventData[]
 }
 
 // Extend GalleryItem to support skeleton mode safely
@@ -32,138 +25,164 @@ export default function GalleryPage() {
   const [galleryItems, setGalleryItems] = useState<GalleryItemWithSkeleton[]>([])
   const [loading, setLoading] = useState(false)
   const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null)
-  const [groupedByMonth, setGroupedByMonth] = useState<MonthData[]>([])
-  const [filter, setFilter] = useState<string>('All')
+  const [groupedByEvent, setGroupedByEvent] = useState<EventData[]>([])
 
   const [headerRef, headerInView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
 
-  const groupGalleryByMonthAndEvent = (items: GalleryItemWithSkeleton[]): MonthData[] => {
-    // First group by month
-    const monthlyGrouped: { [key: string]: GalleryItemWithSkeleton[] } = {}
+  const groupGalleryByEvent = (items: GalleryItemWithSkeleton[]): EventData[] => {
+    const eventGrouped: { [eventName: string]: GalleryItemWithSkeleton[] } = {}
 
     items.forEach(item => {
-      const date = new Date(item.created_at)
-      const year = date.getFullYear()
-      const month = date.getMonth()
-      const key = `${year}-${month}`
-
-      if (!monthlyGrouped[key]) {
-        monthlyGrouped[key] = []
+      if (!eventGrouped[item.event_name]) {
+        eventGrouped[item.event_name] = []
       }
-      monthlyGrouped[key].push(item)
+      eventGrouped[item.event_name].push(item)
     })
 
-    // Convert to array and for each month, group by event_name
-    const monthDataArray = Object.keys(monthlyGrouped)
-      .map(key => {
-        const [year, month] = key.split('-').map(Number)
-        const date = new Date(year, month)
-        const monthName = date.toLocaleString('default', { month: 'long', year: 'numeric' })
-
-        // Group items in this month by event_name
-        const eventGrouped: { [eventName: string]: GalleryItemWithSkeleton[] } = {}
-        monthlyGrouped[key].forEach(item => {
-          if (!eventGrouped[item.event_name]) {
-            eventGrouped[item.event_name] = []
-          }
-          eventGrouped[item.event_name].push(item)
-        })
-
-        // Convert event groups to array, sorted alphabetically
-        const events = Object.keys(eventGrouped)
-          .sort()
-          .map(eventName => ({
-            eventName,
-            items: eventGrouped[eventName].sort((a, b) =>
-              new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            ),
-          }))
-
-        return {
-          year,
-          month,
-          monthName,
-          events,
-        }
-      })
-      .sort((a, b) => {
-        if (a.year !== b.year) return b.year - a.year
-        return b.month - a.month
-      })
-
-    return monthDataArray
+    return Object.keys(eventGrouped)
+      .sort()
+      .map(eventName => ({
+        eventName,
+        items: eventGrouped[eventName].sort((a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        ),
+      }))
   }
 
   useEffect(() => {
     async function fetchGalleryItems() {
-      // Helper to generate slots for a specific year
-      const generateYearlySlots = (year: number) => {
-        const items: GalleryItemWithSkeleton[] = []
-        const eventNames = ['Ignition', 'Bootstrap', 'Ignition 2', 'Showcase', 'Workshop', 'Meetup']
-
-        // Generate for all 12 months (0-11), in reverse order (Dec -> Jan)
-        for (let month = 11; month >= 0; month--) {
-          // Generate 6 slots per month (satisfies "at least 4")
-          for (let i = 1; i <= 6; i++) {
-            // Create skeleton items instead of placeholder images
-            const eventIndex = (month + i) % eventNames.length;
-            const date = new Date(year, month, Math.max(1, 28 - i * 2))
-
-            items.push({
-              id: `${year}-${month}-${i}`,
-              image_url: '', // Not needed for skeleton
-              caption: '',   // Not needed for skeleton
-              event_name: eventNames[eventIndex],
-              created_at: date.toISOString(),
-              isSkeleton: true
-            })
-          }
-        }
-        return items
-      }
-
-      // Generate data for 2026 (Future/Current) and 2025 (Past)
-      // We define this OUTSIDE the catch block to ensure we can use it as the primary source
       const localItems: GalleryItemWithSkeleton[] = [
-        // April 2026 - Specific User Requested Items
         {
-          id: 'april-1',
+          id: 'bootstrap-2025-09-1',
           image_url: '/assets/gallery/imported/rocket_league.jpg',
-          caption: "Cartman's Crash Out: The boys from South Park, Colorado cause chaos in Rocket League!",
-          event_name: 'Ignition',
-          created_at: new Date(2026, 3, 10).toISOString(),
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 1).toISOString(),
           isSkeleton: false
         },
         {
-          id: 'april-2',
-          image_url: '/assets/gallery/imported/fatal_fury.jpg', // Using local imported file
-          caption: 'Season 2 is here! Get the full experience with the Legend Edition, which includes the base game and Season Pass 1 & 2.',
-          event_name: 'Ignition',
-          created_at: new Date(2026, 3, 12).toISOString(),
+          id: 'bootstrap-2025-09-2',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 2).toISOString(),
           isSkeleton: false
         },
         {
-          id: 'april-3',
-          image_url: '/assets/gallery/imported/raven2.jpg',
-          caption: 'Join the 100-Day Launch Celebration now and experience the battlefield of RAVEN2 with greater power and richer rewards!',
-          event_name: 'Ignition',
-          created_at: new Date(2026, 3, 15).toISOString(),
+          id: 'bootstrap-2025-09-3',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 3).toISOString(),
           isSkeleton: false
         },
         {
-          id: 'april-4',
-          image_url: '/assets/gallery/arz_kiya_hai.png',
-          caption: 'Arz Kiya Hai - Anuv Jain Live at Ignition 2026',
-          event_name: 'Ignition',
-          created_at: new Date(2026, 3, 18).toISOString(),
+          id: 'bootstrap-2025-09-4',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 4).toISOString(),
           isSkeleton: false
         },
-
-        ...generateYearlySlots(2026),
-        ...generateYearlySlots(2025)
+        {
+          id: 'bootstrap-2025-09-5',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 5).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'bootstrap-2025-09-6',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 6).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'bootstrap-2025-09-7',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 7).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'bootstrap-2025-09-8',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Bootstrap \'25 (September 2025)',
+          event_name: 'Bootstrap',
+          created_at: new Date(2025, 8, 8).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-1',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 1).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-2',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 2).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-3',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 3).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-4',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 4).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-5',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 5).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-6',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 6).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-7',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 7).toISOString(),
+          isSkeleton: false
+        },
+        {
+          id: 'ignition-2025-11-8',
+          image_url: '/assets/gallery/imported/rocket_league.jpg',
+          caption: 'Ignition 1.0 (November 2025)',
+          event_name: 'Ignition 1.0',
+          created_at: new Date(2025, 10, 8).toISOString(),
+          isSkeleton: false
+        }
       ]
 
       try {
@@ -173,11 +192,11 @@ export default function GalleryPage() {
         // const items = await getGalleryItems()
 
         setGalleryItems(localItems)
-        setGroupedByMonth(groupGalleryByMonthAndEvent(localItems))
+        setGroupedByEvent(groupGalleryByEvent(localItems))
       } catch (error) {
         console.error('Error fetching gallery items:', error)
         setGalleryItems(localItems)
-        setGroupedByMonth(groupGalleryByMonthAndEvent(localItems))
+        setGroupedByEvent(groupGalleryByEvent(localItems))
       } finally {
         setLoading(false)
       }
@@ -185,16 +204,6 @@ export default function GalleryPage() {
 
     fetchGalleryItems()
   }, [])
-
-  const handleFilterChange = (filterName: string) => {
-    setFilter(filterName)
-    if (filterName === 'All') {
-      setGroupedByMonth(groupGalleryByMonthAndEvent(galleryItems))
-    } else {
-      const filtered = galleryItems.filter(item => item.event_name === filterName)
-      setGroupedByMonth(groupGalleryByMonthAndEvent(filtered))
-    }
-  }
 
   const openLightbox = (item: GalleryItem) => {
     setSelectedItem(item)
@@ -285,7 +294,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Gallery Grid Organized by Month */}
+      {/* Gallery Grid Organized by Event */}
       <section className="py-12 px-4 relative">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500 rounded-full blur-3xl"></div>
@@ -293,54 +302,6 @@ export default function GalleryPage() {
         </div>
 
         <div className="max-w-6xl mx-auto relative z-10">
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-3 mb-12 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleFilterChange('All')}
-              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'All'
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-            >
-              All Events
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleFilterChange('Ignition')}
-              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Ignition'
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-            >
-              Ignition
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleFilterChange('Bootstrap')}
-              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Bootstrap'
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-            >
-              Bootstrap
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleFilterChange('Ignition 2')}
-              className={`px-6 py-4 rounded-lg font-semibold transition-all duration-300 ${filter === 'Ignition 2'
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-                }`}
-            >
-              Ignition 2
-            </motion.button>
-          </div>
-
           {galleryItems.length === 0 ? (
             <div className="text-center py-24">
               <motion.p
@@ -354,32 +315,37 @@ export default function GalleryPage() {
             </div>
           ) : (
             <motion.div layout className="space-y-16">
-              {groupedByMonth.map((monthData, monthIndex) => (
+              {groupedByEvent.map((eventData, eventIndex) => (
                 <motion.div
-                  key={`${monthData.year}-${monthData.month}`}
+                  key={eventData.eventName}
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: monthIndex * 0.1 }}
+                  transition={{ duration: 0.6, delay: eventIndex * 0.1 }}
                   className="space-y-6"
                 >
-                  {/* Month Header */}
-                  <div className="relative flex items-center gap-4 mb-8">
+                  {/* Event Header */}
+                  <div className="relative flex items-center gap-4 mb-6">
                     <h2 className="text-2xl md:text-3xl font-heading font-bold text-white whitespace-nowrap modern-title">
                       <span className="text-transparent bg-clip-text bg-gradient-orange">
-                        {monthData.monthName}
+                        {eventData.eventName}
                       </span>
-                      <span className="text-gray-400 text-lg ml-3 font-normal normal-case">
-                        ({monthData.events.reduce((sum, event) => sum + event.items.length, 0)} {monthData.events.reduce((sum, event) => sum + event.items.length, 0) === 1 ? 'item' : 'items'})
+                      <span className="text-gray-400 text-sm italic font-normal ml-3">
+                        (
+                        {new Date(eventData.items[0].created_at).toLocaleDateString('default', {
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                        )
                       </span>
                     </h2>
                   </div>
 
-                  {/* Grid Layout - 3 items per month */}
+                  {/* Grid Layout - tiles per event */}
                   <motion.div
                     layout
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
                   >
-                    {monthData.events.flatMap(event => event.items).map((item, index) => {
+                    {eventData.items.map((item, index) => {
                       if (item.isSkeleton) {
                         return (
                           <motion.div
@@ -436,14 +402,6 @@ export default function GalleryPage() {
                           </div>
 
                           {/* Content Below Image */}
-                          <div>
-                            <h3 className="text-xl font-bold text-white mb-2 group-hover:text-orange-500 transition-colors duration-300">
-                              {item.event_name}
-                            </h3>
-                            <p className="text-gray-400 text-sm leading-relaxed line-clamp-2">
-                              {item.caption}
-                            </p>
-                          </div>
                         </motion.div>
                       )
                     })}
